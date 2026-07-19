@@ -18,11 +18,16 @@ async function ensureAudioMode(): Promise<void> {
   modeReady = true;
 }
 
-function bindStatus(active: AudioPlayer): void {
+function bindStatus(active: AudioPlayer, track: Track): void {
   let completionHandled = false;
+  let lastPlaying = false;
   active.addListener("playbackStatusUpdate", (status) => {
     usePlayerStore.getState().setPlaying(status.playing);
     usePlayerStore.getState().setProgress(status.currentTime, status.duration || 0);
+    if (status.playing !== lastPlaying) {
+      lastPlaying = status.playing;
+      try { active.setActiveForLockScreen(true, { title: track.title, artist: track.artist, artworkUrl: track.artwork }); } catch { /* non-critical */ }
+    }
     const finished = Boolean(status.didJustFinish) || Boolean(status.duration && status.currentTime >= status.duration - 0.1 && !status.playing);
     if (!finished || completionHandled) return;
     completionHandled = true;
@@ -36,7 +41,7 @@ export async function playTrack(track: Track): Promise<void> {
   try {
     player?.pause();
     player = createAudioPlayer(track.url);
-    bindStatus(player);
+    bindStatus(player, track);
     usePlayerStore.getState().setCurrentTrack(track);
     usePlayerStore.getState().setProgress(0, 0);
     player.play();
