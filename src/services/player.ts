@@ -26,7 +26,7 @@ function bindStatus(active: AudioPlayer, track: Track): void {
     usePlayerStore.getState().setProgress(status.currentTime, status.duration || 0);
     if (status.playing !== lastPlaying) {
       lastPlaying = status.playing;
-      try { active.setActiveForLockScreen(true, { title: track.title, artist: track.artist, artworkUrl: track.artwork }); } catch { /* non-critical */ }
+      try { active.setActiveForLockScreen(true, { title: track.title, artist: track.artist, artworkUrl: track.artwork }, { showSeekForward: true, showSeekBackward: true }); } catch { /* non-critical */ }
     }
     const finished = Boolean(status.didJustFinish) || Boolean(status.duration && status.currentTime >= status.duration - 0.1 && !status.playing);
     if (!finished || completionHandled) return;
@@ -45,7 +45,7 @@ export async function playTrack(track: Track): Promise<void> {
     usePlayerStore.getState().setCurrentTrack(track);
     usePlayerStore.getState().setProgress(0, 0);
     player.play();
-    player.setActiveForLockScreen(true, { title: track.title, artist: track.artist, artworkUrl: track.artwork });
+    player.setActiveForLockScreen(true, { title: track.title, artist: track.artist, artworkUrl: track.artwork }, { showSeekForward: true, showSeekBackward: true });
     await recordListeningHistory(track);
   } catch (error) {
     usePlayerStore.getState().setPlaying(false);
