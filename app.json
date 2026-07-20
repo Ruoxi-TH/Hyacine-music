@@ -1,0 +1,80 @@
+{
+  "expo": {
+    "name": "风堇音乐",
+    "description": "中文：风堇音乐，支持后台播放、播放队列、媒体控制、三语界面与可定制视觉主题的音乐播放器。English: Fengjin Music is a music player with background playback, queue management, media controls, three interface languages, and customizable visual themes. 日本語：風菫音楽は、バックグラウンド再生、再生キュー、メディアコントロール、3 言語 UI、カスタマイズ可能なビジュアルテーマに対応した音楽プレーヤーです。",
+    "slug": "hyacine-mobile",
+    "scheme": "hyacine",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#d7f56a"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow Fengjin Music to access audio files for your library."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      "expo-audio"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hyacine.music",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "NSAppleMusicUsageDescription": "Allow Fengjin Music to access your media library."
+      }
+    },
+    "android": {
+      "package": "com.hyacine.music",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.WAKE_LOCK"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#11120e",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "usesCleartextTraffic": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "newArchEnabled": false,
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

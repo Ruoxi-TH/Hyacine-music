@@ -1,0 +1,103 @@
+name: Android Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Optional version, for example 1.1 or Beta1.1. Leave empty for the next Beta version."
+        required: false
+        type: string
+      prerelease:
+        description: "Publish as prerelease"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip release]')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: version
+        name: Choose release version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "$REQUESTED_VERSION" ]; then
+            if [[ ! "$REQUESTED_VERSION" =~ ^(Beta)?[0-9]+\.[0-9]+$ ]]; then
+              echo "Version must be 1.1 or Beta1.1" >&2
+              exit 1
+            fi
+            echo "version=$REQUESTED_VERSION" >> "$GITHUB_OUTPUT"
+            echo "prerelease=${{ inputs.prerelease }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          latest=$(git tag -l --sort=-version:refname | awk '/^vBeta[0-9]+\.[0-9]+$/ { sub(/^vBeta/, ""); print; exit }')
+          if [ -n "$latest" ]; then
+            major=${latest%%.*}
+            minor=${latest##*.}
+          else
+            stable=$(git tag -l --sort=-version:refname | awk '/^v[0-9]+\.[0-9]+$/ { sub(/^v/, ""); print; exit }')
+            stable=${stable:-1.0}
+            major=${stable%%.*}
+            minor=${stable##*.}
+          fi
+          echo "version=Beta${major}.$((minor + 1))" >> "$GITHUB_OUTPUT"
+          echo "prerelease=true" >> "$GITHUB_OUTPUT"
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Sync release version into App configuration
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          node -e 'const fs=require("fs"); const version=process.env.VERSION; const appPath="app.json"; const app=JSON.parse(fs.readFileSync(appPath,"utf8")); app.expo.version=version; app.expo.android.versionCode=Number(process.env.RUN_NUMBER); fs.writeFileSync(appPath,JSON.stringify(app,null,2)+"\n"); const packagePath="package.json"; const pkg=JSON.parse(fs.readFileSync(packagePath,"utf8")); pkg.version=version; fs.writeFileSync(packagePath,JSON.stringify(pkg,null,2)+"\n");'
+      - run: pnpm typecheck
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Generate Android project and build APK
+        run: |
+          pnpm exec expo prebuild --platform android --non-interactive --no-install
+          cd android
+          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a -x lintVitalRelease
+      - name: Commit synchronized App version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.json package.json
+          git diff --cached --quiet || git commit -m "chore: release ${VERSION} [skip release]"
+          git push
+      - name: Name APK
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: mv android/app/build/outputs/apk/release/app-release.apk "hyacine-music-${VERSION}.apk"
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: "风堇音乐 ${{ steps.version.outputs.version }}"
+          prerelease: ${{ steps.version.outputs.prerelease }}
+          generate_release_notes: true
+          files: hyacine-music-${{ steps.version.outputs.version }}.apk
