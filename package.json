@@ -1,6 +1,6 @@
 {
   "name": "hyacine-mobile",
-  "version": "Beta1.6",
+  "version": "Beta2.24",
   "packageManager": "pnpm@10.15.0",
   "engines": {
     "node": ">=20.19.4",
