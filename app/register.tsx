@@ -25,14 +25,12 @@ import {
   sendVerificationCode,
   setStoredToken,
 } from "@/services/auth";
-import { LIQUID_GLASS_COLORS } from "@/constants/liquidGlass";
 
 export default function RegisterScreen(): React.JSX.Element {
   const { profile, updateProfile } = useAccount();
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const isLiquid = preferences.uiStyle === "liquid";
-  const glass = tokens.isLight ? LIQUID_GLASS_COLORS.light : LIQUID_GLASS_COLORS.dark;
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -210,7 +208,7 @@ export default function RegisterScreen(): React.JSX.Element {
                   className="h-12 rounded-xl px-4"
                   style={{
                     color: tokens.text,
-                    backgroundColor: isLiquid ? glass.background : tokens.surface,
+                    backgroundColor: isLiquid ? "transparent" : tokens.surface,
                     borderWidth: 1,
                     borderColor: tokens.surfaceBorder,
                   }}
@@ -234,7 +232,7 @@ export default function RegisterScreen(): React.JSX.Element {
                   className="h-12 rounded-xl px-4"
                   style={{
                     color: tokens.text,
-                    backgroundColor: isLiquid ? glass.background : tokens.surface,
+                    backgroundColor: isLiquid ? "transparent" : tokens.surface,
                     borderWidth: 1,
                     borderColor: tokens.surfaceBorder,
                   }}
@@ -311,7 +309,7 @@ export default function RegisterScreen(): React.JSX.Element {
                   className="h-12 rounded-xl px-4"
                   style={{
                     color: tokens.text,
-                    backgroundColor: isLiquid ? glass.background : tokens.surface,
+                    backgroundColor: isLiquid ? "transparent" : tokens.surface,
                     borderWidth: 1,
                     borderColor: tokens.surfaceBorder,
                   }}
@@ -334,7 +332,7 @@ export default function RegisterScreen(): React.JSX.Element {
                   className="h-12 rounded-xl px-4"
                   style={{
                     color: tokens.text,
-                    backgroundColor: isLiquid ? glass.background : tokens.surface,
+                    backgroundColor: isLiquid ? "transparent" : tokens.surface,
                     borderWidth: 1,
                     borderColor: tokens.surfaceBorder,
                   }}

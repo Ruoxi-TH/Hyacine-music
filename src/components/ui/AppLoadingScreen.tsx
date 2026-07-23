@@ -30,7 +30,7 @@ export function AppLoadingScreen(): React.JSX.Element {
   const titleY = title.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
   const titleScale = title.interpolate({ inputRange: [0, 1], outputRange: [0.88, 1] });
 
-  return <View className="flex-1 items-center justify-center" style={{ backgroundColor: "#ffffff" }}>
+  return <View className="flex-1 items-center justify-center" style={{ backgroundColor: tokens.background }}>
     <Animated.View className="absolute h-40 w-40 rounded-full border-2" style={{ borderColor: `${tokens.accent}44`, transform: [{ rotate }] }} />
     <Animated.View className="absolute h-32 w-32 rounded-full border" style={{ borderColor: "#20211e18", transform: [{ scale }] }} />
     <Animated.View className="h-24 w-24 overflow-hidden rounded-[30px]" style={{ opacity, transform: [{ scale }], shadowColor: "#20211e", shadowOpacity: 0.16, shadowRadius: 24, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>

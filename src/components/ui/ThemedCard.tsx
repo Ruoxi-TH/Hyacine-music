@@ -55,7 +55,7 @@ export function ThemedCard({ children, className = "", style, ...props }: Themed
         className={`overflow-hidden border p-5 ${className}`}
         style={[
           {
-            backgroundColor: tokens.isLight ? "rgba(226,234,248,0.20)" : "rgba(18,26,42,0.44)",
+            backgroundColor: "transparent",
             borderColor: "#ffffff8c",
             borderRadius: radius,
             shadowColor: "#31415f",
@@ -74,7 +74,6 @@ export function ThemedCard({ children, className = "", style, ...props }: Themed
           tint={tokens.isLight ? "light" : "dark"}
           style={{ backgroundColor: "transparent" }}
         />
-        <View pointerEvents="none" className="absolute inset-0" style={{ backgroundColor: tokens.isLight ? "rgba(220,230,247,0.22)" : "rgba(25,34,54,0.20)" }} />
         <View pointerEvents="none" className="absolute left-0 right-0 top-0 h-px" style={{ backgroundColor: "#ffffff88" }} />
         {children}
       </View>
@@ -88,7 +87,7 @@ export function ThemedCard({ children, className = "", style, ...props }: Themed
       className={`overflow-hidden border p-5 ${className}`}
       style={[
         {
-          backgroundColor: tokens.isLight ? "rgba(226,234,248,0.20)" : "rgba(18,26,42,0.44)",
+          backgroundColor: "transparent",
           borderColor: darkMode ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.55)",
           borderRadius: radius,
           shadowColor: "#24364f",
@@ -104,10 +103,9 @@ export function ThemedCard({ children, className = "", style, ...props }: Themed
       <GlassBackdrop
         pointerEvents="none"
         blurRadius={12}
-        tintColor="transparent"
+        tintColor={darkMode ? "rgba(28,30,38,0.55)" : "rgba(248,250,252,0.55)"}
         style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
       />
-      <View pointerEvents="none" className="absolute inset-0" style={{ backgroundColor: tokens.isLight ? "rgba(220,230,247,0.22)" : "rgba(25,34,54,0.20)" }} />
       <View pointerEvents="none" className="absolute left-0 right-0 top-0 h-px" style={{ backgroundColor: darkMode ? "rgba(255,255,255,0.42)" : "rgba(255,255,255,0.88)" }} />
       {children}
     </View>
