@@ -134,6 +134,8 @@ const dictionaries = {
     loginEmailRequired: "Email is required",
     loginPasswordRequired: "Password is required",
     loginWelcome: "Welcome back!",
+    // Admin permission
+    adminPermissionDenied: "Admin access required", adminPermissionHint: "Only admin users can access this page.",
     // Welcome
     welcomeSubtitle: "Put your music in one player",
   },
@@ -264,6 +266,8 @@ const dictionaries = {
     loginEmailRequired: "请输入邮箱",
     loginPasswordRequired: "请输入密码",
     loginWelcome: "欢迎回来！",
+    // Admin permission
+    adminPermissionDenied: "需要管理员权限", adminPermissionHint: "仅管理员用户可访问此页面。",
     // Welcome
     welcomeSubtitle: "让音乐，不被打断",
   },
@@ -344,8 +348,58 @@ const dictionaries = {
     // Onboarding
     welcomeTitle: "Hyacine Music", backendConnectError: "接続できません", backendConnectHint: "サーバーが起動していることを確認。http://パブリックIP:3000 を使用し、127.0.0.1 は使用しないでください。",
     changeAvatar: "アバターを変更", chooseFromGallery: "ギャラリーから選択",
-    // Library
-    deleteFailed: "削除失敗",
+    // Admin permission
+    adminPermissionDenied: "管理者権限が必要です", adminPermissionHint: "管理者ユーザーのみアクセスできます。",
+    // Register
+    registerTitle: "アカウント作成",
+    registerSubtitle: "Hyacine Music に参加",
+    registerUsername: "ユーザー名",
+    registerUsernamePlaceholder: "2〜20文字",
+    registerEmail: "メールアドレス",
+    registerEmailPlaceholder: "your@email.com",
+    registerCode: "認証コード",
+    registerCodePlaceholder: "6桁の数字",
+    registerSendCode: "コードを送信",
+    registerPassword: "パスワード",
+    registerPasswordPlaceholder: "8文字以上、英数字を含む",
+    registerConfirmPassword: "パスワード確認",
+    registerConfirmPasswordPlaceholder: "パスワードを再入力",
+    registerButton: "アカウント作成",
+    registering: "作成中...",
+    registerGoToLogin: "アカウントをお持ちですか？サインイン",
+    registerSuccess: "成功",
+    registerError: "エラー",
+    registerUsernameRequired: "ユーザー名を入力してください",
+    registerEmailRequired: "メールアドレスを入力してください",
+    registerCodeRequired: "認証コードを入力してください",
+    registerPasswordRequired: "パスワードを入力してください",
+    registerPasswordMismatch: "パスワードが一致しません",
+    registerBackendRequired: "先にサーバーアドレスを設定してください",
+    registerCaptchaError: "キャプチャの取得に失敗",
+    registerCaptchaTitle: "キャプチャを入力",
+    registerCaptchaPlaceholder: "4文字",
+    registerCaptchaRequired: "キャプチャを入力してください",
+    registerCodeSent: "認証コードを送信しました",
+    registerCodeError: "認証コードの送信に失敗",
+    registerWelcome: "Hyacine Music へようこそ！",
+    confirm: "確認",
+    // Login
+    loginTitle: "サインイン",
+    loginSubtitle: "Hyacine Music へおかえりなさい",
+    loginEmail: "メールアドレス",
+    loginEmailPlaceholder: "your@email.com",
+    loginPassword: "パスワード",
+    loginPasswordPlaceholder: "パスワード",
+    loginButton: "サインイン",
+    loggingIn: "サインイン中...",
+    loginGoToRegister: "アカウントをお持ちでないですか？作成",
+    loginSuccess: "成功",
+    loginError: "エラー",
+    loginEmailRequired: "メールアドレスを入力してください",
+    loginPasswordRequired: "パスワードを入力してください",
+    loginWelcome: "おかえりなさい！",
+    // Welcome
+    welcomeSubtitle: "音楽を、途切れさせない",
   },
 } as const;
 
@@ -378,7 +432,7 @@ export function I18nProvider({ children }: PropsWithChildren): React.JSX.Element
       setCurrentLanguage(nextLanguage);
       await SecureStore.setItemAsync(LANGUAGE_STORAGE_KEY, nextLanguage);
     },
-    t: (key) => dictionaries[language][key],
+    t: (key) => (dictionaries[language] as typeof dictionaries.en)[key],
   }), [language]);
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
