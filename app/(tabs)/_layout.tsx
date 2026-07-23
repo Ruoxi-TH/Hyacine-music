@@ -93,7 +93,7 @@ return <Animated.View pointerEvents="box-none" style={{ opacity: fadeOpacity, tr
       >
         <GlassBackdrop
           blurRadius={18}
-          tintColor={tokens.isLight ? "rgba(248,250,252,0.45)" : "rgba(28,30,38,0.45)"}
+          tintColor="transparent"
           style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
         />
         <View className="absolute left-5 right-5 top-0 h-px" style={{ backgroundColor: tokens.isLight ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.42)" }} />
@@ -102,7 +102,7 @@ return <Animated.View pointerEvents="box-none" style={{ opacity: fadeOpacity, tr
       <View
         className="absolute inset-0 overflow-hidden rounded-[38px] border"
         style={{
-          backgroundColor: tokens.isLight ? "rgba(226,234,248,0.20)" : "rgba(18,26,42,0.44)",
+        backgroundColor: "transparent",
           borderColor: tokens.isLight ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.38)",
           shadowColor: "#182848",
           shadowOpacity: 0.18,
@@ -111,8 +111,7 @@ return <Animated.View pointerEvents="box-none" style={{ opacity: fadeOpacity, tr
           elevation: 12,
         }}
       >
-        <BlurView intensity={72} tint={tokens.isLight ? "light" : "dark"} className="absolute inset-0" />
-        <View className="absolute inset-0" style={{ backgroundColor: tokens.isLight ? "rgba(220,230,247,0.22)" : "rgba(25,34,54,0.20)" }} />
+        <BlurView intensity={72} tint={tokens.isLight ? "light" : "dark"} className="absolute inset-0" style={{ backgroundColor: "transparent" }} />
         <View className="absolute left-5 right-5 top-0 h-px" style={{ backgroundColor: "rgba(255,255,255,0.92)" }} />
       </View>
     )}
@@ -161,7 +160,7 @@ function LensPosition({ position, tabWidth }: { position: Animated.Value; tabWid
         bottom: 4,
         width: pillWidth,
         borderRadius: 999,
-        backgroundColor: tokens.isLight ? "rgba(226,234,248,0.20)" : "rgba(18,26,42,0.44)",
+        backgroundColor: "transparent",
         borderWidth: 1,
         borderColor: tokens.isLight ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.45)",
         shadowColor: tokens.isLight ? "#94a3b8" : "#93c5fd",
@@ -172,8 +171,7 @@ function LensPosition({ position, tabWidth }: { position: Animated.Value; tabWid
         transform: [{ translateX }],
       }}
     >
-      <BlurView intensity={88} tint={tokens.isLight ? "light" : "dark"} className="absolute inset-0" />
-      <View className="absolute inset-0" style={{ backgroundColor: tokens.isLight ? "rgba(255,255,255,0.20)" : "rgba(255,255,255,0.08)" }} />
+      <BlurView intensity={88} tint={tokens.isLight ? "light" : "dark"} className="absolute inset-0" style={{ backgroundColor: "transparent" }} />
       <View className="absolute left-3 right-3 top-0 h-px" style={{ backgroundColor: "rgba(255,255,255,0.96)" }} />
     </Animated.View>
   );

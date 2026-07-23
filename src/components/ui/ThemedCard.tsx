@@ -103,7 +103,7 @@ export function ThemedCard({ children, className = "", style, ...props }: Themed
       <GlassBackdrop
         pointerEvents="none"
         blurRadius={12}
-        tintColor={darkMode ? "rgba(28,30,38,0.55)" : "rgba(248,250,252,0.55)"}
+        tintColor="transparent"
         style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
       />
       <View pointerEvents="none" className="absolute left-0 right-0 top-0 h-px" style={{ backgroundColor: darkMode ? "rgba(255,255,255,0.42)" : "rgba(255,255,255,0.88)" }} />

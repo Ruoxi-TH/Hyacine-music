@@ -183,7 +183,7 @@ export default function SourcesScreen(): React.JSX.Element {
             <Text style={{ color: tokens.mutedText, fontSize: 13, fontWeight: "700" }}>{t("onboardingStep")} 03</Text>
             <Text className="mt-1" style={{ color: tokens.text, fontSize: 32, fontWeight: "800" }}>{t("sourcesTitle")}</Text>
           </View>
-          <View className="h-11 w-11 items-center justify-center rounded-full" style={{ backgroundColor: isLiquid ? "#ffffff52" : tokens.surface, borderWidth: 1, borderColor: tokens.surfaceBorder }}>
+          <View className="h-11 w-11 items-center justify-center rounded-full" style={{ backgroundColor: isLiquid ? "transparent" : tokens.surface, borderWidth: 1, borderColor: isLiquid ? "#ffffff8c" : tokens.surfaceBorder }}>
             <Text style={{ color: tokens.text, fontSize: 18, fontWeight: "700" }}>03</Text>
           </View>
         </View>
@@ -210,7 +210,7 @@ export default function SourcesScreen(): React.JSX.Element {
             {neteaseMode === "qr" ? <View className="flex-1 items-center justify-center pb-12">
               <View className="items-center">
                 <ThemedCard className="h-[294px] w-[294px] items-center justify-center p-2" style={{ borderRadius: 42 }}>
-                  {qr ? <View className="h-[278px] w-[278px] items-center justify-center rounded-[34px] bg-white p-3"><QRCode value={qr} size={254} color="#17212d" backgroundColor="#ffffff" /></View> : <LinearGradient className="h-[278px] w-[278px] items-center justify-center rounded-[34px]" colors={isLiquid ? ["#ffffff74", "#d8ecff50"] : [tokens.backgroundSecondary, tokens.surface]}>
+                  {qr ? <View className="h-[278px] w-[278px] items-center justify-center rounded-[34px] p-3" style={{ backgroundColor: isLiquid ? "transparent" : "#ffffff" }}><QRCode value={qr} size={254} color="#17212d" backgroundColor={isLiquid ? "transparent" : "#ffffff"} /></View> : <LinearGradient className="h-[278px] w-[278px] items-center justify-center rounded-[34px]" colors={isLiquid ? ["transparent", "transparent"] : [tokens.backgroundSecondary, tokens.surface]}>
                     <Text style={{ color: tokens.mutedText, fontSize: 15, fontWeight: "700" }}>{t("secureSessionWaiting")}</Text>
                   </LinearGradient>}
                 </ThemedCard>
