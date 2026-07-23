@@ -5,59 +5,30 @@ import { useTheme } from "@/theme";
 interface LiquidControlSurfaceProps extends ViewProps {
   children: React.ReactNode;
   className?: string;
-  cornerRadius?: number;
 }
 
-export function LiquidControlSurface({
-  children,
-  className = "",
-  style,
-  cornerRadius,
-  ...props
-}: LiquidControlSurfaceProps): React.JSX.Element {
+export function LiquidControlSurface({ children, className = "", style, ...props }: LiquidControlSurfaceProps): React.JSX.Element {
   const { preferences, tokens } = useTheme();
   const liquid = preferences.uiStyle === "liquid";
-  const radius = cornerRadius ?? 28;
-
-  if (!liquid) {
-    return (
-      <View
-        className={`overflow-hidden border ${className}`}
-        style={[
-          {
-            backgroundColor: tokens.surfaceStrong,
-            borderColor: tokens.surfaceBorder,
-            borderRadius: radius,
-            elevation: 0,
-          },
-          style,
-        ]}
-        {...props}
-      >
-        {children}
-      </View>
-    );
-  }
 
   return (
     <View
       className={`overflow-hidden border ${className}`}
       style={[
         {
-          backgroundColor: "transparent",
-          borderColor: "#ffffff8c",
-          shadowColor: "#24364f",
-          shadowOpacity: 0.08,
-          shadowRadius: 10,
+          backgroundColor: liquid ? "transparent" : tokens.surfaceStrong,
+          borderColor: liquid ? "#ffffff8c" : tokens.surfaceBorder,
+          shadowColor: liquid ? "#24364f" : "#000000",
+          shadowOpacity: liquid ? 0.08 : 0,
+          shadowRadius: liquid ? 10 : 0,
           shadowOffset: { width: 0, height: 4 },
-          borderRadius: radius,
-          elevation: 0,
+          elevation: liquid ? 0 : 0,
         },
         style,
       ]}
       {...props}
     >
-      {Platform.OS === "ios" ? (
+      {liquid && Platform.OS === "ios" ? (
         <BlurView
           pointerEvents="none"
           intensity={28}
@@ -66,7 +37,7 @@ export function LiquidControlSurface({
           style={{ backgroundColor: "transparent" }}
         />
       ) : null}
-      <View pointerEvents="none" className="absolute left-0 right-0 top-0 h-px" style={{ backgroundColor: "#ffffffaa" }} />
+      {liquid ? <View pointerEvents="none" className="absolute left-0 right-0 top-0 h-px" style={{ backgroundColor: "#ffffffaa" }} /> : null}
       {children}
     </View>
   );
