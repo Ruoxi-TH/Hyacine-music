@@ -12,6 +12,7 @@ import { ThemedScreen } from "@/components/ui/ThemedScreen";
 import { useTheme } from "@/theme";
 import { supportsNeteaseCapability } from "@/services/neteaseCapabilities";
 import { apiBase } from "@/utils/apiBase";
+import { LIQUID_GLASS_COLORS } from "@/constants/liquidGlass";
 
 type Source = "netease" | "bilibili";
 interface QrPayload { key?: string; qrUrl?: string; message?: string; }
@@ -22,6 +23,7 @@ export default function SourcesScreen(): React.JSX.Element {
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const isLiquid = preferences.uiStyle === "liquid";
+  const glass = tokens.isLight ? LIQUID_GLASS_COLORS.light : LIQUID_GLASS_COLORS.dark;
   const [source, setSource] = useState<Source>("netease");
   const [neteaseMode, setNeteaseMode] = useState<"qr" | "cookie">("qr");
   const sourceMotion = useRef(new Animated.Value(0)).current;
@@ -165,7 +167,7 @@ export default function SourcesScreen(): React.JSX.Element {
   })).current;
 
   const tabStyle = (item: Source) => ({
-    backgroundColor: source === item ? (isLiquid ? "transparent" : tokens.surfaceStrong) : "transparent",
+    backgroundColor: source === item ? (isLiquid ? glass.background : tokens.surfaceStrong) : "transparent",
     borderRadius: 18,
     borderWidth: source === item && isLiquid ? 1 : 0,
     borderColor: source === item && isLiquid ? `${tokens.text}38` : "transparent",
@@ -183,7 +185,7 @@ export default function SourcesScreen(): React.JSX.Element {
             <Text style={{ color: tokens.mutedText, fontSize: 13, fontWeight: "700" }}>{t("onboardingStep")} 03</Text>
             <Text className="mt-1" style={{ color: tokens.text, fontSize: 32, fontWeight: "800" }}>{t("sourcesTitle")}</Text>
           </View>
-          <View className="h-11 w-11 items-center justify-center rounded-full" style={{ backgroundColor: isLiquid ? "transparent" : tokens.surface, borderWidth: 1, borderColor: isLiquid ? "#ffffff8c" : tokens.surfaceBorder }}>
+          <View className="h-11 w-11 items-center justify-center rounded-full" style={{ backgroundColor: isLiquid ? glass.background : tokens.surface, borderWidth: 1, borderColor: isLiquid ? glass.border : tokens.surfaceBorder }}>
             <Text style={{ color: tokens.text, fontSize: 18, fontWeight: "700" }}>03</Text>
           </View>
         </View>
@@ -202,7 +204,7 @@ export default function SourcesScreen(): React.JSX.Element {
           {source === "netease" ? <View className="flex-1 pt-8">
             <ThemedCard className="p-1.5" style={{ borderRadius: 23 }}>
               <View className="flex-row">
-                {(["qr", "cookie"] as const).map((mode) => <Pressable key={mode} className="h-11 flex-1 items-center justify-center" style={{ backgroundColor: neteaseMode === mode ? (isLiquid ? "transparent" : tokens.surfaceStrong) : "transparent", borderRadius: 18, borderWidth: neteaseMode === mode && isLiquid ? 1 : 0, borderColor: neteaseMode === mode && isLiquid ? `${tokens.text}38` : "transparent" }} onPress={() => { setNeteaseMode(mode); setQr(""); setKey(""); setNote(""); }}>
+                {(["qr", "cookie"] as const).map((mode) => <Pressable key={mode} className="h-11 flex-1 items-center justify-center" style={{ backgroundColor: neteaseMode === mode ? (isLiquid ? glass.background : tokens.surfaceStrong) : "transparent", borderRadius: 18, borderWidth: neteaseMode === mode && isLiquid ? 1 : 0, borderColor: neteaseMode === mode && isLiquid ? `${tokens.text}38` : "transparent" }} onPress={() => { setNeteaseMode(mode); setQr(""); setKey(""); setNote(""); }}>
                   <Text style={{ color: neteaseMode === mode ? tokens.text : tokens.mutedText, fontSize: 14, fontWeight: "800" }}>{mode === "qr" ? t("qrLogin") : t("importCookieTab")}</Text>
                 </Pressable>)}
               </View>
@@ -210,7 +212,7 @@ export default function SourcesScreen(): React.JSX.Element {
             {neteaseMode === "qr" ? <View className="flex-1 items-center justify-center pb-12">
               <View className="items-center">
                 <ThemedCard className="h-[294px] w-[294px] items-center justify-center p-2" style={{ borderRadius: 42 }}>
-                  {qr ? <View className="h-[278px] w-[278px] items-center justify-center rounded-[34px] p-3" style={{ backgroundColor: isLiquid ? "transparent" : "#ffffff" }}><QRCode value={qr} size={254} color="#17212d" backgroundColor={isLiquid ? "transparent" : "#ffffff"} /></View> : <LinearGradient className="h-[278px] w-[278px] items-center justify-center rounded-[34px]" colors={isLiquid ? ["transparent", "transparent"] : [tokens.backgroundSecondary, tokens.surface]}>
+                  {qr ? <View className="h-[278px] w-[278px] items-center justify-center rounded-[34px] p-3" style={{ backgroundColor: isLiquid ? glass.background : "#ffffff" }}><QRCode value={qr} size={254} color="#17212d" backgroundColor={isLiquid ? glass.background : "#ffffff"} /></View> : <LinearGradient className="h-[278px] w-[278px] items-center justify-center rounded-[34px]" colors={isLiquid ? [glass.background, glass.overlay] : [tokens.backgroundSecondary, tokens.surface]}>
                     <Text style={{ color: tokens.mutedText, fontSize: 15, fontWeight: "700" }}>{t("secureSessionWaiting")}</Text>
                   </LinearGradient>}
                 </ThemedCard>
@@ -220,13 +222,13 @@ export default function SourcesScreen(): React.JSX.Element {
             </View> : <View className="flex-1 pt-6">
               <ThemedCard className="p-0" style={{ borderRadius: 28 }}>
                 <View className="px-5 pb-3 pt-5"><Text style={{ color: tokens.text, fontSize: 18, fontWeight: "800" }}>{t("importNeteaseCookie")}</Text><Text className="mt-1 text-sm leading-5" style={{ color: tokens.mutedText }}>{t("importNeteaseCookieHint")}</Text></View>
-                <TextInput value={cookie} onChangeText={setCookie} autoCapitalize="none" autoCorrect={false} multiline placeholder={t("pasteNeteaseCookie")} placeholderTextColor={tokens.mutedText} textAlignVertical="top" style={{ minHeight: 210, color: tokens.text, backgroundColor: isLiquid ? "transparent" : tokens.backgroundSecondary, borderTopWidth: 1, borderColor: tokens.surfaceBorder, padding: 20, fontSize: 14, lineHeight: 22 }} />
+                <TextInput value={cookie} onChangeText={setCookie} autoCapitalize="none" autoCorrect={false} multiline placeholder={t("pasteNeteaseCookie")} placeholderTextColor={tokens.mutedText} textAlignVertical="top" style={{ minHeight: 210, color: tokens.text, backgroundColor: isLiquid ? glass.overlay : tokens.backgroundSecondary, borderTopWidth: 1, borderColor: tokens.surfaceBorder, padding: 20, fontSize: 14, lineHeight: 22 }} />
               </ThemedCard>
             </View>}
           </View> : <View className="flex-1 pt-8">
             <ThemedCard className="p-0" style={{ borderRadius: 28 }}>
               <View className="px-5 pb-3 pt-5"><Text style={{ color: tokens.text, fontSize: 18, fontWeight: "800" }}>{t("importCookie")}</Text><Text className="mt-1 text-sm leading-5" style={{ color: tokens.mutedText }}>{t("cookieRequirements")}</Text></View>
-              <TextInput value={cookie} onChangeText={setCookie} autoCapitalize="none" autoCorrect={false} multiline placeholder={t("cookiePlaceholder")} placeholderTextColor={tokens.mutedText} textAlignVertical="top" style={{ minHeight: 210, color: tokens.text, backgroundColor: isLiquid ? "transparent" : tokens.backgroundSecondary, borderTopWidth: 1, borderColor: tokens.surfaceBorder, padding: 20, fontSize: 14, lineHeight: 22 }} />
+              <TextInput value={cookie} onChangeText={setCookie} autoCapitalize="none" autoCorrect={false} multiline placeholder={t("cookiePlaceholder")} placeholderTextColor={tokens.mutedText} textAlignVertical="top" style={{ minHeight: 210, color: tokens.text, backgroundColor: isLiquid ? glass.overlay : tokens.backgroundSecondary, borderTopWidth: 1, borderColor: tokens.surfaceBorder, padding: 20, fontSize: 14, lineHeight: 22 }} />
             </ThemedCard>
           </View>}
         </Animated.View>

@@ -13,11 +13,13 @@ import { apiBase } from "@/utils/apiBase";
 import type { Track } from "@/types/music";
 import { usePlayerStore } from "@/store/playerStore";
 import { globalScrollY, handleScrollForFade, handleScrollEndForFade, resetScrollY } from "@/utils/scrollY";
+import { LIQUID_GLASS_COLORS } from "@/constants/liquidGlass";
 
 export default function ProfileScreen(): React.JSX.Element {
   const { t } = useI18n();
   const { profile, getSourceCredential, updateProfile } = useAccount();
   const { tokens } = useTheme();
+  const glass = tokens.isLight ? LIQUID_GLASS_COLORS.light : LIQUID_GLASS_COLORS.dark;
   const { playTrack } = useAudio();
   const setQueue = usePlayerStore((state) => state.setQueue);
   const [history, setHistory] = useState<Track[]>([]);
@@ -67,8 +69,8 @@ export default function ProfileScreen(): React.JSX.Element {
           </Pressable>
         </View>
 
-        <View className="mt-8 overflow-hidden border" style={{ backgroundColor: "transparent", borderColor: tokens.surfaceBorder, borderRadius: 28 }}>
-          <Pressable className="flex-row items-center p-5" style={{ backgroundColor: "transparent" }} onPress={() => router.push("/settings")}>
+        <View className="mt-8 overflow-hidden border" style={{ backgroundColor: glass.background, borderColor: tokens.surfaceBorder, borderRadius: 28 }}>
+          <Pressable className="flex-row items-center p-5" style={{ backgroundColor: glass.background }} onPress={() => router.push("/settings")}>
             <View className="h-20 w-20 overflow-hidden rounded-full" style={{ backgroundColor: `${tokens.accent}24`, borderWidth: 2, borderColor: `${tokens.accent}88` }}>
               {profile?.avatarUrl ? <Image className="h-full w-full" source={{ uri: profile.avatarUrl }} contentFit="cover" /> : <Text className="pt-5 text-center" style={{ color: tokens.accent, fontSize: 24, fontWeight: "900" }}>{profile?.displayName?.slice(0, 1).toUpperCase() || "H"}</Text>}
             </View>
@@ -86,8 +88,8 @@ export default function ProfileScreen(): React.JSX.Element {
         </View>
         <View className="mt-4 gap-3">
           {history.map((track) => (
-            <View key={track.id} className="overflow-hidden border" style={{ backgroundColor: "transparent", borderColor: tokens.surfaceBorder, borderRadius: 20 }}>
-              <Pressable className="flex-row items-center p-3" style={{ backgroundColor: "transparent" }} onPress={() => { setQueue(history, track.id); void playTrack(track); }}>
+            <View key={track.id} className="overflow-hidden border" style={{ backgroundColor: glass.background, borderColor: tokens.surfaceBorder, borderRadius: 20 }}>
+              <Pressable className="flex-row items-center p-3" style={{ backgroundColor: glass.background }} onPress={() => { setQueue(history, track.id); void playTrack(track); }}>
                 <TrackCover uri={track.artwork} title={track.title} size={56} radius={16} />
                 <View className="ml-3 min-w-0 flex-1">
                   <Text numberOfLines={1} style={{ color: tokens.text, fontWeight: "800" }}>{track.title}</Text>
@@ -97,7 +99,7 @@ export default function ProfileScreen(): React.JSX.Element {
               </Pressable>
             </View>
           ))}
-          {!history.length ? <View className="items-center border py-10" style={{ backgroundColor: "transparent", borderColor: tokens.surfaceBorder, borderRadius: 24 }}><Text style={{ color: tokens.mutedText, fontSize: 14 }}>{t("noHistoryHint")}</Text></View> : null}
+          {!history.length ? <View className="items-center border py-10" style={{ backgroundColor: glass.background, borderColor: tokens.surfaceBorder, borderRadius: 24 }}><Text style={{ color: tokens.mutedText, fontSize: 14 }}>{t("noHistoryHint")}</Text></View> : null}
         </View>
       </Animated.ScrollView>
     </ThemedScreen>

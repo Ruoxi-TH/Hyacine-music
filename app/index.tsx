@@ -16,6 +16,7 @@ import { ThemedScreen } from "@/components/ui/ThemedScreen";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/theme";
 import { normalizeBackendUrl } from "@/utils/apiBase";
+import { LIQUID_GLASS_COLORS } from "@/constants/liquidGlass";
 
 const urlPattern = /^https?:\/\/[^\s]+$/i;
 
@@ -24,6 +25,7 @@ export default function WelcomeScreen(): React.JSX.Element {
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const isLiquid = preferences.uiStyle === "liquid";
+  const glass = tokens.isLight ? LIQUID_GLASS_COLORS.light : LIQUID_GLASS_COLORS.dark;
 
   const [backend, setBackend] = useState(profile?.backendUrl || "");
   const [error, setError] = useState("");
@@ -120,7 +122,7 @@ export default function WelcomeScreen(): React.JSX.Element {
               className="h-12 rounded-xl px-4"
               style={{
                 color: tokens.text,
-                backgroundColor: isLiquid ? "transparent" : tokens.surface,
+                backgroundColor: isLiquid ? glass.background : tokens.surface,
                 borderWidth: 1,
                 borderColor: error ? "#ef4444" : tokens.surfaceBorder,
               }}
