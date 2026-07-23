@@ -5,6 +5,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useAudio } from "@/hooks/useAudio";
 import { ThemedScreen } from "@/components/ui/ThemedScreen";
 import { useAccount } from "@/account";
+import { useI18n } from "@/i18n";
 import { useTheme } from "@/theme";
 import { usePlayerStore } from "@/store/playerStore";
 import { apiBase } from "@/utils/apiBase";
@@ -19,6 +20,7 @@ export default function PlaylistDetailScreen(): React.JSX.Element {
   const { profile, getSourceCredential } = useAccount();
   const { playTrack } = useAudio();
   const setQueue = usePlayerStore((state) => state.setQueue);
+  const { t } = useI18n();
   const { tokens } = useTheme();
   const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export default function PlaylistDetailScreen(): React.JSX.Element {
   }, []);
 
   const load = useCallback(async () => {
-    if (!profile?.backendUrl || !id) { setLoading(false); setError("缺少参数"); return; }
+    if (!profile?.backendUrl || !id) { setLoading(false); setError(t("missingParam")); return; }
     const cookie = await getSourceCredential("netease");
     appLog.info("playlist-detail", "load start", { id, cookieMeta: cookieMeta(cookie) });
     try {
@@ -64,9 +66,9 @@ export default function PlaylistDetailScreen(): React.JSX.Element {
     <ThemedScreen>
       <ScrollView contentContainerStyle={{ paddingBottom: 160 }}>
         <View className="flex-row items-center gap-4 px-5 pt-16">
-          <Pressable onPress={() => router.back()}><Text style={{ color: tokens.accent, fontWeight: "800" }}>← 返回</Text></Pressable>
+          <Pressable onPress={() => router.back()}><Text style={{ color: tokens.accent, fontWeight: "800" }}>{`← ${t("back")}`}</Text></Pressable>
           {cover ? <Animated.View style={{ transform: [{ scale: coverScale }], opacity: coverOpacity }}><Image source={{ uri: cover }} style={{ width: 80, height: 80, borderRadius: 16 }} contentFit="cover" /></Animated.View> : null}
-          <View className="flex-1"><Text style={{ color: tokens.text, fontSize: 22, fontWeight: "900" }} numberOfLines={2}>{name ?? "歌单"}</Text><Text style={{ color: tokens.mutedText, fontSize: 13, marginTop: 4 }}>{tracks.length} 首歌曲</Text></View>
+          <View className="flex-1"><Text style={{ color: tokens.text, fontSize: 22, fontWeight: "900" }} numberOfLines={2}>{name ?? t("playlistLabel")}</Text><Text style={{ color: tokens.mutedText, fontSize: 13, marginTop: 4 }}>{tracks.length} {t("queueTracks")}</Text></View>
         </View>
         {loading ? <ActivityIndicator className="mt-12" color={tokens.accent} /> : null}
         {error ? <Text className="mt-8 px-5" style={{ color: tokens.mutedText }}>{error}</Text> : null}

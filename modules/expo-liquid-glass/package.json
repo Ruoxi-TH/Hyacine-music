@@ -1,0 +1,17 @@
+{
+  "name": "expo-liquid-glass",
+  "version": "1.0.0",
+  "description": "Android Liquid Glass view with RenderEffect-based real blur and Apple-inspired glass styling.",
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
+  "scripts": {
+    "build": "tsc -p . --noEmit"
+  },
+  "keywords": ["expo", "android", "liquid", "glass", "blureffect"],
+  "peerDependencies": {
+    "expo": "*",
+    "expo-modules-core": "*",
+    "react": "*",
+    "react-native": "*"
+  }
+}

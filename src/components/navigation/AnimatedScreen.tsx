@@ -22,7 +22,7 @@ export function AnimatedScreen({ children, enabled = true }: AnimatedScreenProps
     }
     progress.value = 0;
     progress.value = withTiming(1, {
-      duration: 280,
+      duration: 220,
       easing: Easing.out(Easing.cubic),
     });
   }, [enabled, progress]);

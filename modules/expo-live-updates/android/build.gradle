@@ -9,7 +9,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 35
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.1.0"
     }
 
     buildTypes {
@@ -41,5 +41,6 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation project(':expo-modules-core')
 }

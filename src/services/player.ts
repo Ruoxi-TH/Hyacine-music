@@ -3,8 +3,14 @@ import { usePlayerStore } from "@/store/playerStore";
 import { recordListeningHistory } from "@/services/listeningHistory";
 import type { Track } from "@/types/music";
 import { appLog } from "@/utils/logger";
-import { updateFluidCloudNowPlaying, removeFluidCloudNowPlaying } from "@/services/fluidCloud";
-import { startLiveUpdatesSession, updateLiveUpdatesPlaybackState, stopLiveUpdatesSession } from "@/services/liveUpdates";
+import {
+  startLiveUpdatesSession,
+  updateLiveUpdatesMetadata,
+  updateLiveUpdatesPlaybackState,
+  updateLiveUpdatesQueue,
+  stopLiveUpdatesSession,
+} from "@/services/liveUpdates";
+
 let player: AudioPlayer | null = null;
 let modeReady = false;
 let playbackCompletionHandler: (() => void) | null = null;
@@ -24,7 +30,8 @@ async function ensureAudioMode(): Promise<void> {
 }
 
 let nextPlayerId = 0;
-let lastFluidCloudPush = 0;
+let lastStatePush = 0;
+
 function bindStatus(active: AudioPlayer): void {
   const playerId = ++nextPlayerId;
   let lastTime = 0;
@@ -42,27 +49,18 @@ function bindStatus(active: AudioPlayer): void {
     const now = Date.now();
     const timeChanged = Math.abs(nowTime - lastTime) > 1;
     const playingChanged = nowPlaying !== lastPlaying;
-    if (currentTrack && (timeChanged || playingChanged) && now - lastFluidCloudPush > 1000) {
-      lastFluidCloudPush = now;
-      void updateFluidCloudNowPlaying({
-        title: currentTrack.title,
-        artist: currentTrack.artist,
-        coverUrl: currentTrack.artwork,
-        progress: nowTime,
-        duration: nowDuration,
-        isPlaying: nowPlaying,
-      });
-      
-      // Update Live Updates playback state
+
+    // MediaSession 状态：500ms 一次，状态变化立即推
+    if (currentTrack && (playingChanged || now - lastStatePush > 500)) {
+      lastStatePush = now;
       void updateLiveUpdatesPlaybackState({
-        title: currentTrack.title,
-        artist: currentTrack.artist,
-        artworkUrl: currentTrack.artwork,
         isPlaying: nowPlaying,
         position: nowTime,
         duration: nowDuration,
+        speed: 1,
       });
     }
+
     lastTime = nowTime;
     lastPlaying = nowPlaying;
     if (completed) return;
@@ -113,6 +111,8 @@ function bindStatus(active: AudioPlayer): void {
         playResolved(queue[0], queue[0].id);
       }
     }
+    void playModeActual;
+    void repeatModeActual;
   });
 }
 
@@ -129,22 +129,36 @@ export async function playTrack(track: Track): Promise<void> {
     player.setActiveForLockScreen(true, { title: track.title, artist: track.artist, artworkUrl: track.artwork });
     await recordListeningHistory(track);
 
-    // Start Live Updates session
-    await startLiveUpdatesSession({
+    // 启动 MediaSession（ColorOS 14+ 流体云自动从这里读取）
+    await startLiveUpdatesSession();
+
+    // 同步完整元数据
+    const { queue, queueIndex } = usePlayerStore.getState();
+    const queueIndexResolved = Math.max(0, queueIndex);
+    await updateLiveUpdatesMetadata({
       title: track.title,
       artist: track.artist,
       artworkUrl: track.artwork,
+      duration: track.duration ?? 0,
+      trackId: track.id,
+      queueIndex: queueIndexResolved,
+      queueLength: queue.length,
+    });
+
+    // 同步队列（让锁屏显示 1/10 等）
+    if (queue.length > 0) {
+      await updateLiveUpdatesQueue(
+        queue.map((t) => ({ id: t.id, title: t.title, artist: t.artist })),
+        queueIndexResolved,
+      );
+    }
+
+    // 同步初始播放状态
+    await updateLiveUpdatesPlaybackState({
       isPlaying: true,
       position: 0,
       duration: track.duration ?? 0,
-    });
-    void updateFluidCloudNowPlaying({
-      title: track.title,
-      artist: track.artist,
-      coverUrl: track.artwork,
-      progress: 0,
-      duration: track.duration ?? 0,
-      isPlaying: true,
+      speed: 1,
     });
   } catch (error) {
     usePlayerStore.getState().setPlaying(false);
@@ -156,6 +170,7 @@ export async function playTrack(track: Track): Promise<void> {
 export async function togglePlayback(): Promise<void> {
   if (!player) return;
   if (player.playing) player.pause(); else player.play();
+  // 状态变更由 bindStatus 推送到系统，无需在此重复推送
 }
 
 export async function seekBy(seconds: number): Promise<void> {
@@ -166,4 +181,24 @@ export async function seekBy(seconds: number): Promise<void> {
 export async function seekTo(seconds: number): Promise<void> {
   if (!player) return;
   await player.seekTo(Math.max(0, seconds));
+}
+
+/** 由外部（如锁屏回调）调用，立即同步当前状态到 MediaSession。 */
+export async function syncPlaybackStateNow(): Promise<void> {
+  if (!player) return;
+  const currentTrack = usePlayerStore.getState().currentTrack;
+  if (!currentTrack) return;
+  await updateLiveUpdatesPlaybackState({
+    isPlaying: player.playing,
+    position: player.currentTime,
+    duration: player.duration ?? 0,
+    speed: 1,
+  });
+}
+
+/** App 退出时清理。 */
+export async function teardownPlayer(): Promise<void> {
+  try { player?.pause(); } catch {}
+  player = null;
+  await stopLiveUpdatesSession();
 }

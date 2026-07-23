@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {
+  Animated,
   ActivityIndicator,
   FlatList,
   Pressable,
@@ -18,6 +19,7 @@ import { supportsNeteaseCapability } from "@/services/neteaseCapabilities";
 import { useTheme } from "@/theme";
 import type { Track } from "@/types/music";
 import { usePlayerStore } from "@/store/playerStore";
+import { globalScrollY, handleScrollForFade, handleScrollEndForFade, resetScrollY } from "@/utils/scrollY";
 
 export default function SearchScreen(): React.JSX.Element {
   const { t } = useI18n();
@@ -34,10 +36,11 @@ export default function SearchScreen(): React.JSX.Element {
   useEffect(() => {
     if (profile?.musicSources?.length) setSource(profile.musicSources[0]);
   }, [profile?.musicSources]);
+  useEffect(() => { resetScrollY(); }, []);
 
   const onSearch = useCallback(async (): Promise<void> => {
     if (!profile?.backendUrl) {
-      setError("请先连接音乐源");
+      setError(t("connectSourceFirst"));
       return;
     }
     const q = keywords.trim();
@@ -47,7 +50,7 @@ export default function SearchScreen(): React.JSX.Element {
     try {
       if (source === "netease" && !(await supportsNeteaseCapability(profile.backendUrl, "search"))) {
         setResults([]);
-        setError("当前服务器尚未提供网易云搜索，请切换到哔哩哔哩或配置兼容上游。");
+        setError(t("neteaseSearchUnavailable"));
         return;
       }
       const cookie = await getSourceCredential(source);
@@ -58,10 +61,10 @@ export default function SearchScreen(): React.JSX.Element {
         cookie,
       });
       setResults(rows);
-      if (!rows.length) setError("没有找到结果");
+      if (!rows.length) setError(t("noSearchResults"));
     } catch (e) {
       setResults([]);
-      setError(e instanceof Error ? e.message : "搜索失败");
+      setError(e instanceof Error ? e.message : t("searchFailed"));
     } finally {
       setLoading(false);
     }
@@ -82,7 +85,7 @@ export default function SearchScreen(): React.JSX.Element {
         });
         await playTrack(playable);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "播放失败");
+        setError(e instanceof Error ? e.message : t("playbackFailed"));
       } finally {
         setPlayingId("");
       }
@@ -95,7 +98,7 @@ export default function SearchScreen(): React.JSX.Element {
       <View className="flex-1 px-5 pb-36 pt-16">
         <Text style={{ color: tokens.text, fontSize: 31, fontWeight: "800" }}>{t("search")}</Text>
         <Text className="mt-2 text-sm" style={{ color: tokens.mutedText }}>
-          {source === "bilibili" ? "仅显示 B 站音乐分区内容，需要已绑定账号" : "搜索网易云歌曲并播放"}
+          {source === "bilibili" ? t("biliSearchHint") : t("neteaseSearchHint")}
         </Text>
         <LiquidControlSurface className="mt-5 flex-row rounded-full p-1" style={{ borderRadius: 24 }}>
           {(["netease", "bilibili"] as const).map((item) => (
@@ -106,7 +109,7 @@ export default function SearchScreen(): React.JSX.Element {
               onPress={() => { setSource(item); setResults([]); setError(""); }}
             >
               <Text style={{ color: source === item ? tokens.text : tokens.mutedText, fontSize: 13, fontWeight: "800" }}>
-                {item === "netease" ? "网易云音乐" : "哔哩哔哩"}
+                {item === "netease" ? t("neteaseCloud") : t("bilibili")}
               </Text>
             </Pressable>
           ))}
@@ -126,7 +129,7 @@ export default function SearchScreen(): React.JSX.Element {
             onSubmitEditing={() => void onSearch()}
           />
           <Pressable onPress={() => void onSearch()} disabled={loading}>
-            <Text style={{ color: tokens.accent, fontWeight: "800" }}>{loading ? "..." : "搜索"}</Text>
+            <Text style={{ color: tokens.accent, fontWeight: "800" }}>{loading ? "..." : t("search")}</Text>
           </Pressable>
         </LiquidControlSurface>
 
@@ -145,11 +148,13 @@ export default function SearchScreen(): React.JSX.Element {
             className="mt-6"
             data={results}
             keyExtractor={(item) => item.id}
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: globalScrollY } } }], { useNativeDriver: false, listener: (e: { nativeEvent: { contentOffset: { x: number; y: number } } }) => handleScrollForFade(e.nativeEvent) })}
+            scrollEventThrottle={16}
+            onScrollEndDrag={handleScrollEndForFade}
+            onMomentumScrollEnd={handleScrollEndForFade}
             ItemSeparatorComponent={() => <View className="h-3" />}
             ListEmptyComponent={
-              <Text className="mt-10 text-sm leading-6" style={{ color: tokens.mutedText }}>
-                输入关键词后点搜索。点结果即可解析播放地址并播放。
-              </Text>
+              <Text className="mt-10 text-sm leading-6" style={{ color: tokens.mutedText }}>{t("searchEmptyHint")}</Text>
             }
             renderItem={({ item }) => (
               <Pressable

@@ -20,7 +20,7 @@ cssInterop(Image, { className: "style" });
 const stackAnimation = {
   headerShown: false as const,
   animation: "slide_from_right" as const,
-  animationDuration: 280,
+  animationDuration: 220,
   gestureEnabled: true,
   fullScreenGestureEnabled: true,
   animationTypeForReplace: "push" as const,

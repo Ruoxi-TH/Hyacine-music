@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react";
 import { Animated, Easing, Image, Text, View } from "react-native";
+import { useI18n } from "@/i18n";
 import { useTheme } from "@/theme";
 
 const brandIcon = require("../../../assets/icon.png");
 
 export function AppLoadingScreen(): React.JSX.Element {
+  const { t } = useI18n();
   const { tokens } = useTheme();
   const breathe = useRef(new Animated.Value(0)).current;
   const spin = useRef(new Animated.Value(0)).current;
@@ -34,7 +36,7 @@ export function AppLoadingScreen(): React.JSX.Element {
     <Animated.View className="h-24 w-24 overflow-hidden rounded-[30px]" style={{ opacity, transform: [{ scale }], shadowColor: "#20211e", shadowOpacity: 0.16, shadowRadius: 24, shadowOffset: { width: 0, height: 10 }, elevation: 8 }}>
       <Image className="h-full w-full" source={brandIcon} resizeMode="cover" />
     </Animated.View>
-    <Animated.View className="mt-7" style={{ opacity: title, transform: [{ translateY: titleY }, { scale: titleScale }] }}><Text style={{ color: "#20211e", fontSize: 22, fontWeight: "800", letterSpacing: 2 }}>风堇音乐</Text></Animated.View>
+    <Animated.View className="mt-7" style={{ opacity: title, transform: [{ translateY: titleY }, { scale: titleScale }] }}><Text style={{ color: "#20211e", fontSize: 22, fontWeight: "800", letterSpacing: 2 }}>{t("brandName")}</Text></Animated.View>
     <View className="mt-5 h-1 w-16 overflow-hidden rounded-full" style={{ backgroundColor: "#20211e16" }}><Animated.View className="h-full w-10 rounded-full" style={{ backgroundColor: tokens.accent, transform: [{ translateX: breathe.interpolate({ inputRange: [0, 1], outputRange: [-24, 28] }) }] }} /></View>
   </View>;
 }

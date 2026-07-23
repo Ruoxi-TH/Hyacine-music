@@ -16,11 +16,22 @@ export async function isFluidCloudAvailable(): Promise<boolean> {
   return availabilityCache;
 }
 
+/**
+ * 推送歌曲信息到 OPPO 流体云（旧版 ContentProvider 兜底路径）。
+ * ColorOS 14+ 上，流体云会自动读取活跃 MediaSession，此函数仅作为补充渠道，
+ * 用于不支持自动渲染的设备。
+ */
 export async function updateFluidCloudNowPlaying(data: NowPlayingData): Promise<void> {
   if (Platform.OS !== "android") return;
   if (!(await isFluidCloudAvailable())) return;
   try {
-    await FluidCloud.updateNowPlaying({ ...data, supportPlayPause: true, supportNext: true, supportPrev: true, supportSeek: true });
+    await FluidCloud.updateNowPlaying({
+      ...data,
+      supportPlayPause: true,
+      supportNext: true,
+      supportPrev: true,
+      supportSeek: true,
+    });
   } catch (e) {
     appLog.warn("fluid-cloud", "updateNowPlaying failed", { error: String(e) });
   }

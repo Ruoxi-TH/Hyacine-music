@@ -4,6 +4,8 @@ import { BlurView } from "expo-blur";
 import { Animated, PanResponder, Platform, Pressable, StyleSheet, Text, View, type ColorValue, type LayoutChangeEvent } from "react-native";
 import { useI18n } from "@/i18n";
 import { useTheme } from "@/theme";
+import { fadeAnim } from "@/utils/scrollY";
+import { GlassBackdrop } from "../../modules/expo-glass-backdrop/src";
 
 const tabs = [
   { route: "/(tabs)", symbol: "⌂", key: "home" },
@@ -69,23 +71,51 @@ function LiquidTabBar(): React.JSX.Element {
     setContentWidth(width);
   };
 
-return <View pointerEvents="box-none" className="absolute bottom-3 left-4 right-4 h-[76px]">
-    <View
-      className="absolute inset-0 overflow-hidden rounded-[38px] border"
-      style={{
-        backgroundColor: tokens.isLight ? "rgba(226,234,248,0.20)" : "rgba(18,26,42,0.44)",
-        borderColor: tokens.isLight ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.38)",
-        shadowColor: "#182848",
-        shadowOpacity: 0.18,
-        shadowRadius: 24,
-        shadowOffset: { width: 0, height: 10 },
-        elevation: 12,
-      }}
-    >
-      <BlurView intensity={72} tint={tokens.isLight ? "light" : "dark"} className="absolute inset-0" />
-      <View className="absolute inset-0" style={{ backgroundColor: tokens.isLight ? "rgba(220,230,247,0.22)" : "rgba(25,34,54,0.20)" }} />
-      <View className="absolute left-5 right-5 top-0 h-px" style={{ backgroundColor: "rgba(255,255,255,0.92)" }} />
-    </View>
+  // 滑动渐隐：fadeAnim 由各 tab 页面滚动事件驱动（滑动时→0，停止后→1）
+  const fadeOpacity = fadeAnim;
+  const fadeTranslate = fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [80, 0], extrapolate: "clamp" });
+
+return <Animated.View pointerEvents="box-none" style={{ opacity: fadeOpacity, transform: [{ translateY: fadeTranslate }] }}>
+  <View pointerEvents="box-none" className="absolute bottom-3 left-4 right-4 h-[76px] z-50">
+    {Platform.OS === "android" ? (
+      <View
+        pointerEvents="none"
+        className="absolute inset-0 overflow-hidden rounded-[38px] border"
+        style={{
+          backgroundColor: "transparent",
+          borderColor: tokens.isLight ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.42)",
+          shadowColor: "#182848",
+          shadowOpacity: 0.18,
+          shadowRadius: 24,
+          shadowOffset: { width: 0, height: 10 },
+          elevation: 12,
+        }}
+      >
+        <GlassBackdrop
+          blurRadius={18}
+          tintColor={tokens.isLight ? "rgba(248,250,252,0.45)" : "rgba(28,30,38,0.45)"}
+          style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}
+        />
+        <View className="absolute left-5 right-5 top-0 h-px" style={{ backgroundColor: tokens.isLight ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.42)" }} />
+      </View>
+    ) : (
+      <View
+        className="absolute inset-0 overflow-hidden rounded-[38px] border"
+        style={{
+          backgroundColor: tokens.isLight ? "rgba(226,234,248,0.20)" : "rgba(18,26,42,0.44)",
+          borderColor: tokens.isLight ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.38)",
+          shadowColor: "#182848",
+          shadowOpacity: 0.18,
+          shadowRadius: 24,
+          shadowOffset: { width: 0, height: 10 },
+          elevation: 12,
+        }}
+      >
+        <BlurView intensity={72} tint={tokens.isLight ? "light" : "dark"} className="absolute inset-0" />
+        <View className="absolute inset-0" style={{ backgroundColor: tokens.isLight ? "rgba(220,230,247,0.22)" : "rgba(25,34,54,0.20)" }} />
+        <View className="absolute left-5 right-5 top-0 h-px" style={{ backgroundColor: "rgba(255,255,255,0.92)" }} />
+      </View>
+    )}
     <View className="absolute bottom-1.5 left-1.5 right-1.5 top-1.5" onLayout={onContentLayout} {...panResponder.panHandlers}>
       {tabWidth ? <LensPosition position={position} tabWidth={tabWidth} /> : null}
       <View pointerEvents="box-none" className="flex-1 flex-row">
@@ -109,7 +139,8 @@ return <View pointerEvents="box-none" className="absolute bottom-3 left-4 right-
         })}
       </View>
     </View>
-  </View>;
+  </View>
+</Animated.View>;
 }
 
 function LensPosition({ position, tabWidth }: { position: Animated.Value; tabWidth: number }): React.JSX.Element {
@@ -205,7 +236,12 @@ function MiuixTabBar(): React.JSX.Element {
     setContentWidth(width);
   };
 
-  return <Animated.View pointerEvents="box-none" style={{ transform: [{ translateY: slideY }] }}>
+  // 滑动渐隐：fadeAnim 由各 tab 页面滚动事件驱动（滑动时→0，停止后→1）
+  const fadeOpacity = fadeAnim;
+  const fadeTranslate = fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [80, 0], extrapolate: "clamp" });
+
+  return <Animated.View pointerEvents="box-none" style={{ opacity: fadeOpacity, transform: [{ translateY: fadeTranslate }] }}>
+    <Animated.View pointerEvents="box-none" style={{ transform: [{ translateY: slideY }] }}>
     <View className="absolute bottom-16 left-3 right-3 h-[70px]">
       <View className="absolute inset-0 overflow-hidden rounded-[34px] border" style={{ backgroundColor: tokens.isLight ? "#fdfdff" : "#202124", borderColor: `${tokens.accent}35`, shadowColor: "#111827", shadowOpacity: 0.2, shadowRadius: 24, shadowOffset: { width: 0, height: 10 }, elevation: 14 }}>
         <View className="absolute left-0 right-0 top-0 h-px" style={{ backgroundColor: `${tokens.accent}25` }} />
@@ -229,6 +265,7 @@ function MiuixTabBar(): React.JSX.Element {
         </View>
       </View>
     </View>
+    </Animated.View>
   </Animated.View>;
 }
 

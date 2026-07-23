@@ -1,10 +1,14 @@
 import { useCallback, useEffect } from "react";
+import { Platform } from "react-native";
+import { NativeEventEmitter } from "react-native";
 import type { Track } from "@/types/music";
 import { appLog, summarizeUrl } from "@/utils/logger";
 import { useAccount } from "@/account";
 import { resolvePlayableTrack } from "@/services/musicApi";
 import { useAudioPreferences } from "@/audioPreferences";
 import { usePlayerStore } from "@/store/playerStore";
+import type { MediaControlEvent } from "@/services/liveUpdates";
+
 type PlayerModule = typeof import("@/services/player");
 
 function loadPlayer(): Promise<PlayerModule> {
@@ -41,6 +45,7 @@ export function useAudio(): UseAudioResult {
       throw error;
     }
   }, [getSourceCredential, profile?.backendUrl, quality]);
+
   const togglePlayback = useCallback(async () => {
     appLog.info("audio", "togglePlayback");
     try {
@@ -65,6 +70,7 @@ export function useAudio(): UseAudioResult {
     appLog.info("audio", "seekTo", { seconds });
     await (await loadPlayer()).seekTo(seconds);
   }, []);
+
   const skipTrack = useCallback(async (direction: -1 | 1) => {
     const { queue, queueIndex, playMode, setQueue } = usePlayerStore.getState();
     if (queue.length < 2 || queueIndex < 0) return;
@@ -75,9 +81,67 @@ export function useAudio(): UseAudioResult {
     setQueue(queue, nextTrack.id);
     await playTrack(nextTrack);
   }, [playTrack]);
+
+  // 注册 MediaSession 控制事件回流：锁屏 / 流体云点击按钮时由原生层 emit
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    let emitter: NativeEventEmitter | null = null;
+    let subscription: { remove: () => void } | null = null;
+    let cancelled = false;
+
+    void loadPlayer().then(() => {
+      if (cancelled) return;
+      try {
+        const modules = require("expo-modules-core");
+        const nativeModule = modules?.requireNativeModule?.("ExpoLiveUpdates");
+        if (!nativeModule) return;
+        emitter = new NativeEventEmitter(nativeModule);
+        subscription = emitter.addListener("mediaControl", async (event: MediaControlEvent) => {
+          appLog.info("audio", "mediaControl event", { action: event.action });
+          try {
+            const mod = await loadPlayer();
+            switch (event.action) {
+              case "play":
+              case "pause":
+                await mod.togglePlayback();
+                break;
+              case "stop":
+                await mod.togglePlayback();
+                break;
+              case "next":
+                await skipTrack(1);
+                break;
+              case "prev":
+                await skipTrack(-1);
+                break;
+              case "seek":
+                if (typeof event.position === "number") {
+                  await mod.seekTo(event.position);
+                  await mod.syncPlaybackStateNow?.();
+                }
+                break;
+            }
+          } catch (e) {
+            appLog.warn("audio", "mediaControl handler failed", { error: String(e) });
+          }
+        });
+      } catch (e) {
+        appLog.warn("audio", "subscribe mediaControl failed", { error: String(e) });
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      try { subscription?.remove(); } catch {}
+      subscription = null;
+      emitter = null;
+    };
+  }, [skipTrack]);
+
   useEffect(() => {
     void loadPlayer().then(({ setPlaybackCompletionHandler }) => setPlaybackCompletionHandler(null));
   }, []);
+
   return { playTrack, togglePlayback, seekBy, seekTo, skipTrack };
 }
 

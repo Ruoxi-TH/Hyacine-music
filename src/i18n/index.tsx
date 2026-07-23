@@ -18,7 +18,7 @@ const dictionaries = {
     language: "Language", appearance: "Appearance", darkMode: "Dark listening room", apiStatus: "Music service", apiReady: "Ready to connect", accountSection: "ACCOUNT", musicService: "Music service", manageMusicService: "Manage music service", myPlaylists: "My playlists", myPlaylistsUnavailable: "Connect Netease Cloud Music to load your playlists.",
     closePlayer: "Close", nothingPlaying: "Nothing is playing", backToHome: "Back to home", nowPlaying: "NOW PLAYING", comments: "Comments", addFavorite: "Add to favorites", removeFavorite: "Remove from favorites",
     pause: "Pause", play: "Play", previous15: "Back 15 seconds", next15: "Forward 15 seconds", miniPlayer: "Now playing", lyricsUnavailable: "Lyrics will appear here when this music source provides them.",
-    repeatOne: "Repeat one", repeatAll: "Repeat all", sequentialMode: "Sequential", shuffleMode: "Shuffle",
+    repeatOne: "Repeat one", repeatAll: "Repeat all", sequentialMode: "Sequential", shuffleMode: "Shuffle", cycleMode: "Play mode",
     previousTrack: "Previous", nextTrack: "Next", loadMoreComments: "Load more comments", noMoreComments: "No more comments",
     queueTitle: "Now playing", queueTracks: "tracks", clearQueue: "Clear queue", clearQueueTitle: "Clear play queue", clearQueueBody: "Current playback continues, but no more tracks will auto-play.", cancel: "Cancel", clear: "Clear", removeFromQueue: "Remove from queue", queueEmpty: "Songs will appear here after playback.", back: "Back", queueLabel: "Queue",
     settingsTitle: "Appearance & settings", appearanceSection: "APPEARANCE", playerSection: "PLAYER",
@@ -138,6 +138,23 @@ const dictionaries = {
     adminPermissionDenied: "Admin access required", adminPermissionHint: "Only admin users can access this page.",
     // Welcome
     welcomeSubtitle: "Put your music in one player",
+    // Home / Search / Player errors
+    connectToViewDaily: "Connect Netease Cloud Music to view daily recommendations",
+    noDailyRecommendations: "This server does not provide Netease daily recommendations yet.",
+    loadRecommendationsFailed: "Failed to load recommendations",
+    playbackFailed: "Playback failed",
+    connectSourceFirst: "Please connect a music source first",
+    neteaseSearchUnavailable: "This server does not provide Netease search yet. Switch to Bilibili or configure an upstream-compatible backend.",
+    noSearchResults: "No results found",
+    searchFailed: "Search failed",
+    biliSearchHint: "Shows Bilibili music content only. A linked account is required.",
+    neteaseSearchHint: "Search and play Netease Cloud Music songs",
+    searchEmptyHint: "Enter keywords and tap search. Tap a result to resolve and play its audio.",
+    effectsSection: "Effects",
+    neteaseUser: "Netease user",
+    qrNotSupported: "This server does not support QR login. Please import your Netease Cookie.",
+    missingParam: "Missing parameter",
+    playlistLabel: "Playlist",
   },
   "zh-CN": {
     home: "首页", search: "搜索", library: "音乐库", profile: "我的",
@@ -151,7 +168,7 @@ const dictionaries = {
     language: "语言", appearance: "外观", darkMode: "深色聆听空间", apiStatus: "音乐服务", apiReady: "等待连接", accountSection: "账户", musicService: "音乐服务", manageMusicService: "管理音乐服务", myPlaylists: "我的歌单", myPlaylistsUnavailable: "连接网易云音乐后即可加载你的歌单。",
     closePlayer: "关闭", nothingPlaying: "当前没有播放内容", backToHome: "返回首页", nowPlaying: "正在播放", comments: "评论", addFavorite: "收藏", removeFavorite: "取消收藏",
     pause: "暂停", play: "播放", previous15: "后退 15 秒", next15: "前进 15 秒", miniPlayer: "正在播放", lyricsUnavailable: "暂时没有可用歌词",
-    repeatOne: "单曲循环", repeatAll: "列表循环", sequentialMode: "顺序播放", shuffleMode: "随机播放",
+    repeatOne: "单曲循环", repeatAll: "列表循环", sequentialMode: "顺序播放", shuffleMode: "随机播放", cycleMode: "循环模式",
     previousTrack: "上一首", nextTrack: "下一首", loadMoreComments: "加载更多评论", noMoreComments: "没有更多评论了",
     queueTitle: "当前播放", queueTracks: "首", clearQueue: "清空队列", clearQueueTitle: "清空播放队列", clearQueueBody: "当前播放会继续，但不会再自动切换下一首。", cancel: "取消", clear: "清空", removeFromQueue: "移出队列", queueEmpty: "播放歌曲后会出现在这里", back: "返回", queueLabel: "队列",
     settingsTitle: "外观与设置", appearanceSection: "外观", playerSection: "播放器",
@@ -270,6 +287,23 @@ const dictionaries = {
     adminPermissionDenied: "需要管理员权限", adminPermissionHint: "仅管理员用户可访问此页面。",
     // Welcome
     welcomeSubtitle: "让音乐，不被打断",
+    // Home / Search / Player errors
+    connectToViewDaily: "绑定网易云音乐后可查看每日推荐",
+    noDailyRecommendations: "当前服务器尚未提供网易云每日推荐。",
+    loadRecommendationsFailed: "无法加载每日推荐",
+    playbackFailed: "播放失败",
+    connectSourceFirst: "请先连接音乐源",
+    neteaseSearchUnavailable: "当前服务器尚未提供网易云搜索，请切换到哔哩哔哩或配置兼容上游。",
+    noSearchResults: "没有找到结果",
+    searchFailed: "搜索失败",
+    biliSearchHint: "仅显示 B 站音乐分区内容，需要已绑定账号",
+    neteaseSearchHint: "搜索网易云歌曲并播放",
+    searchEmptyHint: "输入关键词后点搜索。点结果即可解析播放地址并播放。",
+    effectsSection: "音效",
+    neteaseUser: "网易云用户",
+    qrNotSupported: "当前服务器不支持扫码登录，请导入网易云 Cookie。",
+    missingParam: "缺少参数",
+    playlistLabel: "歌单",
   },
   ja: {
     home: "ホーム", search: "検索", library: "ライブラリ", profile: "プロフィール",
@@ -283,7 +317,7 @@ const dictionaries = {
     language: "言語", appearance: "表示", darkMode: "ダーク・リスニングルーム", apiStatus: "音楽サービス", apiReady: "接続待ち", accountSection: "アカウント", musicService: "音楽サービス", manageMusicService: "音楽サービスを管理", myPlaylists: "マイプレイリスト", myPlaylistsUnavailable: "NetEase Cloud Music を接続するとプレイリストを読み込めます。",
     closePlayer: "閉じる", nothingPlaying: "再生中の曲はありません", backToHome: "ホームへ戻る", nowPlaying: "再生中", comments: "コメント", addFavorite: "お気に入りに追加", removeFavorite: "お気に入りから削除",
     pause: "一時停止", play: "再生", previous15: "15秒戻る", next15: "15秒進む", miniPlayer: "再生中", lyricsUnavailable: "利用できる歌詞はありません。",
-    repeatOne: "1曲リピート", repeatAll: "全曲リピート", sequentialMode: "順次再生", shuffleMode: "シャッフル",
+    repeatOne: "1曲リピート", repeatAll: "全曲リピート", sequentialMode: "順次再生", shuffleMode: "シャッフル", cycleMode: "再生モード",
     previousTrack: "前の曲", nextTrack: "次の曲", loadMoreComments: "もっと読み込む", noMoreComments: "これ以上コメントはありません",
     queueTitle: "再生中", queueTracks: "曲", clearQueue: "キューをクリア", clearQueueTitle: "再生キューをクリア", clearQueueBody: "現在の再生は続きますが、次の曲への自動切り替えは停止します。", cancel: "キャンセル", clear: "クリア", removeFromQueue: "キューから削除", queueEmpty: "再生するとここに曲が表示されます。", back: "戻る", queueLabel: "キュー",
     settingsTitle: "表示と設定", appearanceSection: "表示", playerSection: "プレーヤー",
@@ -400,10 +434,29 @@ const dictionaries = {
     loginWelcome: "おかえりなさい！",
     // Welcome
     welcomeSubtitle: "音楽を、途切れさせない",
+    // Library
+    deleteFailed: "削除失敗",
+    // Home / Search / Player errors
+    connectToViewDaily: "NetEase Cloud Musicを接続するとデイリーおすすめを表示できます",
+    noDailyRecommendations: "このサーバーはまだNetEaseデイリーおすすめを提供していません。",
+    loadRecommendationsFailed: "おすすめの読み込みに失敗しました",
+    playbackFailed: "再生に失敗しました",
+    connectSourceFirst: "先に音楽ソースを接続してください",
+    neteaseSearchUnavailable: "このサーバーはまだNetEase検索を提供していません。Bilibiliに切り替えるか、アップストリーム互換のバックエンドを設定してください。",
+    noSearchResults: "結果が見つかりませんでした",
+    searchFailed: "検索に失敗しました",
+    biliSearchHint: "Bilibili音楽分区のコンテンツのみ表示。アカウント連携が必要です。",
+    neteaseSearchHint: "NetEase Cloud Musicの曲を検索して再生",
+    searchEmptyHint: "キーワードを入力して検索をタップ。結果をタップすると再生アドレスを解決して再生します。",
+    effectsSection: "エフェクト",
+    neteaseUser: "NetEaseユーザー",
+    qrNotSupported: "このサーバーはQRログインに対応していません。NetEase Cookieをインポートしてください。",
+    missingParam: "パラメータ不足",
+    playlistLabel: "プレイリスト",
   },
 } as const;
 
-type TranslationKey = keyof typeof dictionaries.en;
+export type TranslationKey = keyof typeof dictionaries.en;
 interface I18nContextValue {
   language: Language;
   setLanguage: (language: Language) => Promise<void>;

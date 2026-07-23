@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Animated, Pressable, RefreshControl, ScrollView, Text, TextInput, View } from "react-native";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { normalizeMediaUrl } from "@/utils/media";
@@ -10,6 +10,7 @@ import { ThemedScreen } from "@/components/ui/ThemedScreen";
 import { useTheme } from "@/theme";
 import { supportsNeteaseCapability } from "@/services/neteaseCapabilities";
 import { apiBase } from "@/utils/apiBase";
+import { globalScrollY, handleScrollForFade, handleScrollEndForFade, resetScrollY } from "@/utils/scrollY";
 const DEFAULT_PLAYLIST_COVER = require("../../assets/playlist-default.jpg");
 
 interface Playlist { id: number; name: string; coverUrl: string; playCount: number; trackCount: number; description: string; }
@@ -99,6 +100,7 @@ export default function LibraryScreen(): React.JSX.Element {
   }, [getSourceCredential, profile, t]);
 
   useEffect(() => { void loadPlaylists(); }, [loadPlaylists]);
+  useEffect(() => { resetScrollY(); }, []);
   const loadMoreRecommendations = async (): Promise<void> => {
     if (!profile || activeTab !== "recommended" || loadingMoreRecommendations || !hasMoreRecommendations) return;
     setLoadingMoreRecommendations(true);
@@ -149,14 +151,14 @@ export default function LibraryScreen(): React.JSX.Element {
           const cookie = await getSourceCredential("netease");
           const response = await fetch(`${apiBase(profile.backendUrl)}/music-sources/netease/playlists/delete`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: playlist.id, cookie }) });
           const result = await response.json().catch(() => ({})) as { message?: string };
-          if (!response.ok) throw new Error(result.message || `删除失败 HTTP ${response.status}`);
+          if (!response.ok) throw new Error(result.message || `${t("deleteFailed")} HTTP ${response.status}`);
           setPlaylists((current) => current.filter((item) => item.id !== playlist.id));
         } catch (cause) { setError(cause instanceof Error ? cause.message : t("deletePlaylistFailed")); }
       })() },
     ]);
   };
   const visiblePlaylists = activeTab === "mine" ? playlists : recommendations;
-  return <ThemedScreen><ScrollView className="flex-1" contentContainerClassName="px-5 pb-40 pt-16" onScroll={({ nativeEvent }) => { const { contentOffset, contentSize, layoutMeasurement } = nativeEvent; if (contentOffset.y + layoutMeasurement.height >= contentSize.height - 300) void loadMoreRecommendations(); }} scrollEventThrottle={200} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void loadPlaylists(true)} tintColor={tokens.accent} />}>
+  return <ThemedScreen><Animated.ScrollView className="flex-1" contentContainerClassName="px-5 pb-40 pt-16" onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: globalScrollY } } }], { useNativeDriver: false, listener: ({ nativeEvent }: { nativeEvent: { contentOffset: { x: number; y: number }; contentSize: { height: number }; layoutMeasurement: { height: number } } }) => { handleScrollForFade(nativeEvent); const { contentOffset, contentSize, layoutMeasurement } = nativeEvent; if (contentOffset.y + layoutMeasurement.height >= contentSize.height - 300) void loadMoreRecommendations(); } })} scrollEventThrottle={200} onScrollEndDrag={handleScrollEndForFade} onMomentumScrollEnd={handleScrollEndForFade} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => void loadPlaylists(true)} tintColor={tokens.accent} />}>
     <View className="flex-row items-start justify-between"><View><Text style={{ color: tokens.text, fontSize: 31, fontWeight: "800" }}>{t("library")}</Text><Text className="mt-2 text-sm" style={{ color: tokens.mutedText }}>{t("librarySubtitle")}</Text></View><LiquidControlSurface className="h-11 w-11 items-center justify-center rounded-full"><Pressable className="h-full w-full items-center justify-center" onPress={() => void loadPlaylists(true)}><Text style={{ color: tokens.text, fontSize: 18 }}>↻</Text></Pressable></LiquidControlSurface></View>
     <LiquidControlSurface className="mt-10 flex-row overflow-hidden rounded-full p-1" style={{ borderRadius: 999 }}><Pressable className="h-11 flex-1 items-center justify-center rounded-full" style={{ backgroundColor: activeTab === "mine" ? `${tokens.accent}30` : "transparent" }} onPress={() => setActiveTab("mine")}><Text style={{ color: activeTab === "mine" ? tokens.text : tokens.mutedText, fontWeight: "800" }}>{t("myPlaylists")}</Text></Pressable><Pressable className="h-11 flex-1 items-center justify-center rounded-full" style={{ backgroundColor: activeTab === "recommended" ? `${tokens.accent}30` : "transparent" }} onPress={() => setActiveTab("recommended")}><Text style={{ color: activeTab === "recommended" ? tokens.text : tokens.mutedText, fontWeight: "800" }}>{t("recommendedPlaylists")}</Text></Pressable></LiquidControlSurface>
     {activeTab === "mine" ? <View className="mt-7 flex-row items-center justify-between"><Text style={{ color: tokens.text, fontSize: 21, fontWeight: "800" }}>{t("myPlaylists")}</Text><Pressable onPress={() => setShowCreate((value) => !value)}><Text className="text-xs font-semibold" style={{ color: tokens.accent }}>{showCreate ? t("collapse") : t("newPlaylist")}</Text></Pressable></View> : <Text className="mt-7" style={{ color: tokens.text, fontSize: 21, fontWeight: "800" }}>{t("featured")}</Text>}
@@ -164,5 +166,5 @@ export default function LibraryScreen(): React.JSX.Element {
     {loading ? <View className="h-72 items-center justify-center"><ActivityIndicator color={tokens.accent} /></View> : null}
     {!loading && error ? <Text className="mt-8 text-center" style={{ color: tokens.mutedText }}>{error}</Text> : null}
     {!loading && visiblePlaylists.length ? <View className="mt-5 flex-row flex-wrap justify-between">{visiblePlaylists.map((playlist) => <Pressable key={playlist.id} className="mb-7 w-[48%]" onLongPress={activeTab === "mine" ? () => deletePlaylist(playlist) : undefined} delayLongPress={500} onPress={() => router.push({ pathname: "/playlist/[id]", params: { id: String(playlist.id), name: playlist.name, cover: playlist.coverUrl } })}><View className="aspect-square overflow-hidden rounded-2xl" style={{ backgroundColor: tokens.surface }}><Image className="h-full w-full" source={normalizeMediaUrl(playlist.coverUrl) ? { uri: normalizeMediaUrl(playlist.coverUrl) } : DEFAULT_PLAYLIST_COVER} contentFit="cover" /><View className="absolute bottom-2 right-2 rounded-full px-2 py-1" style={{ backgroundColor: "#00000080" }}><Text style={{ color: "#ffffff", fontSize: 10, fontWeight: "800" }}>▶ {formatPlayCount(playlist.playCount, language)}</Text></View></View><Text className="mt-3 text-sm font-bold" numberOfLines={2} style={{ color: tokens.text }}>{playlist.name}</Text><Text className="mt-1 text-xs" numberOfLines={1} style={{ color: tokens.mutedText }}>{playlist.description || `${playlist.trackCount} ${t("playlistTracks")}`}</Text></Pressable>)}</View> : null}
-  </ScrollView></ThemedScreen>;
+  </Animated.ScrollView></ThemedScreen>;
 }

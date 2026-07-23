@@ -1,0 +1,17 @@
+{
+  "name": "expo-glass-backdrop",
+  "version": "1.0.0",
+  "description": "True liquid glass backdrop for Android using backdrop library + ComposeView + PixelCopy. Distinct from expo-liquid-glass (which uses RenderEffect only).",
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
+  "scripts": {
+    "build": "tsc -p . --noEmit"
+  },
+  "keywords": ["expo", "android", "liquid", "glass", "backdrop", "compose", "pixelcopy"],
+  "peerDependencies": {
+    "expo": "*",
+    "expo-modules-core": "*",
+    "react": "*",
+    "react-native": "*"
+  }
+}
