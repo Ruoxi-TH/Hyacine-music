@@ -65,9 +65,6 @@ export function GlassBackdrop(props: GlassBackdropProps): React.ReactElement {
       style={[
         {
           backgroundColor: tintColor,
-          borderRadius: 28,
-          borderWidth: 1.5,
-          borderColor: "rgba(255,255,255,0.55)",
           overflow: "hidden",
         },
         style,
