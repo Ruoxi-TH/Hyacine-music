@@ -4,7 +4,7 @@
     "description": "风堇音乐是基于 TypeScript、Expo Router 和 React Native 的多音乐源客户端，支持网易云登录、推荐、歌单、搜索、播放、同步歌词、只读评论、本地收藏、听歌历史、队列与随机/循环播放、可定制播放器与设备内管理后台。",
     "slug": "hyacine-mobile",
     "scheme": "hyacine",
-    "version": "Beta2.30",
+    "version": "Beta2.31",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -69,7 +69,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "usesCleartextTraffic": true,
-      "versionCode": 115
+      "versionCode": 116
     },
     "web": {
       "favicon": "./assets/favicon.png"
