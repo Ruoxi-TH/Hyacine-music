@@ -27,24 +27,26 @@ const stackAnimation = {
 };
 
 function AppNavigator(): React.JSX.Element {
-  const { hydrated, profile } = useAccount();
+  const { hydrated, profile, serverUser } = useAccount();
   const pathname = usePathname();
   useRegisterTrackResolver();
-  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue";
+  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/login" && pathname !== "/register" && pathname !== "/onboarding";
 
   useEffect(() => {
     if (!hydrated) return;
     appLog.info("boot", "account hydrated", {
       hasProfile: Boolean(profile),
+      hasServerUser: Boolean(serverUser),
       onboardingCompleted: profile?.onboardingCompleted === true,
       musicSource: profile?.musicSources ?? null,
       backendHost: profile?.backendUrl
         ? profile.backendUrl.replace(/^https?:\/\//i, "").split("/")[0]
         : null,
     });
-  }, [hydrated, profile]);
+  }, [hydrated, profile, serverUser]);
 
   if (!hydrated) return <AppLoadingScreen />;
+
   if (!profile || !profile.onboardingCompleted) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
@@ -52,6 +54,16 @@ function AppNavigator(): React.JSX.Element {
       </Stack>
     );
   }
+
+  if (!serverUser) {
+    return (
+      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
+      </Stack>
+    );
+  }
+
   if (!profile?.musicSources?.length) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade_from_bottom" }}>
@@ -59,12 +71,15 @@ function AppNavigator(): React.JSX.Element {
       </Stack>
     );
   }
+
   return (
     <>
       <Stack screenOptions={stackAnimation}>
         <Stack.Screen name="(tabs)" options={{ animation: "fade", gestureEnabled: false }} />
         <Stack.Screen name="onboarding" options={{ presentation: "card", animation: "slide_from_right" }} />
         <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
         <Stack.Screen
           name="settings"
           options={{
@@ -74,6 +89,17 @@ function AppNavigator(): React.JSX.Element {
             fullScreenGestureEnabled: true,
           }}
         />
+        {serverUser?.role === "admin" ? (
+          <Stack.Screen
+            name="admin"
+            options={{
+              presentation: "card",
+              animation: "slide_from_right",
+              gestureEnabled: true,
+              fullScreenGestureEnabled: true,
+            }}
+          />
+        ) : null}
         <Stack.Screen
           name="player/[id]"
           options={{
