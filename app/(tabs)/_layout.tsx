@@ -116,8 +116,8 @@ return <Animated.View pointerEvents="box-none" style={{ opacity: fadeOpacity, tr
         })}
       </View>
     </View>
-  </View>;
-}
+  </View>
+</Animated.View>;
 }
 
 function LensPosition({ position, tabWidth }: { position: Animated.Value; tabWidth: number }): React.JSX.Element {
