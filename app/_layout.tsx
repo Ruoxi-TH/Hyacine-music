@@ -30,7 +30,7 @@ function AppNavigator(): React.JSX.Element {
   const { hydrated, profile, serverUser } = useAccount();
   const pathname = usePathname();
   useRegisterTrackResolver();
-  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/register" && pathname !== "/login";
+  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/register" && pathname !== "/login" && pathname !== "/onboarding";
 
   useEffect(() => {
     if (!hydrated) return;
@@ -46,17 +46,15 @@ function AppNavigator(): React.JSX.Element {
   }, [hydrated, profile, serverUser]);
 
   if (!hydrated) return <AppLoadingScreen />;
-  
-  // Step 1: No backend URL configured -> show login with server config step
-  if (!profile?.backendUrl) {
+
+  if (!profile || !profile.onboardingCompleted) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
-        <Stack.Screen name="login" />
+        <Stack.Screen name="onboarding" />
       </Stack>
     );
   }
-  
-  // Step 2: Backend configured but not logged in -> show login/register
+
   if (!serverUser) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
@@ -65,17 +63,7 @@ function AppNavigator(): React.JSX.Element {
       </Stack>
     );
   }
-  
-  // Step 3: Logged in but onboarding not completed -> show onboarding
-  if (!profile?.onboardingCompleted) {
-    return (
-      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
-        <Stack.Screen name="onboarding" />
-      </Stack>
-    );
-  }
-  
-  // Step 4: Onboarding done but no music source -> show sources page
+
   if (!profile?.musicSources?.length) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade_from_bottom" }}>
@@ -83,8 +71,7 @@ function AppNavigator(): React.JSX.Element {
       </Stack>
     );
   }
-  
-  // Step 5: All done -> show main app
+
   return (
     <>
       <Stack screenOptions={stackAnimation}>
