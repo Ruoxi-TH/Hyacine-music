@@ -47,11 +47,11 @@ function AppNavigator(): React.JSX.Element {
 
   if (!hydrated) return <AppLoadingScreen />;
   
-  // Step 1: No backend URL configured -> show welcome/onboarding to configure server
+  // Step 1: No backend URL configured -> show login with server config step
   if (!profile?.backendUrl) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
-        <Stack.Screen name="index" />
+        <Stack.Screen name="login" />
       </Stack>
     );
   }

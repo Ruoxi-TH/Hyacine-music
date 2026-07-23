@@ -119,7 +119,19 @@ export function AccountProvider({ children }: PropsWithChildren): React.JSX.Elem
   }, []);
   const updateProfile = useCallback(async (patch: Partial<AccountProfile>) => {
     setProfile((current) => {
-      if (!current) return current;
+      if (!current) {
+        const backendUrl = normalizeBackendUrl(patch.backendUrl ?? "");
+        const next: AccountProfile = {
+          displayName: (patch.displayName ?? "").trim(),
+          avatarUrl: (patch.avatarUrl ?? "").trim(),
+          backendUrl,
+          musicSources: patch.musicSources ?? [],
+          onboardingCompleted: patch.onboardingCompleted ?? false,
+        };
+        profileRef.current = next;
+        void SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(next));
+        return next;
+      }
       const normalized: AccountProfile = {
         displayName: (patch.displayName ?? current.displayName).trim(),
         avatarUrl: (patch.avatarUrl ?? current.avatarUrl).trim(),
