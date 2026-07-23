@@ -9,6 +9,8 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
+import { getStoredToken, setStoredToken, clearStoredToken, getCurrentUser, type User } from "@/services/auth";
+
 export type MusicSource = "netease" | "bilibili";
 export interface AccountProfile {
   displayName: string;
@@ -19,12 +21,15 @@ export interface AccountProfile {
 }
 interface AccountContextValue {
   profile: AccountProfile | null;
+  serverUser: User | null;
   hydrated: boolean;
   saveProfile: (profile: AccountProfile) => Promise<void>;
   updateProfile: (patch: Partial<AccountProfile>) => Promise<void>;
   saveSourceCredential: (source: MusicSource, credential: string) => Promise<void>;
   getSourceCredential: (source: MusicSource) => Promise<string | null>;
   hasSource: (source: MusicSource) => boolean;
+  refreshServerUser: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 const STORAGE_KEY = "hyacine.account-profile";
 const credentialKey = (source: MusicSource): string => `hyacine.music-source.${source}`;
@@ -56,6 +61,7 @@ function arraysEqual<T>(a: T[], b: T[]): boolean {
 }
 export function AccountProvider({ children }: PropsWithChildren): React.JSX.Element {
   const [profile, setProfile] = useState<AccountProfile | null>(null);
+  const [serverUser, setServerUser] = useState<User | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const profileRef = useRef<AccountProfile | null>(null);
   useEffect(() => {
@@ -71,6 +77,33 @@ export function AccountProvider({ children }: PropsWithChildren): React.JSX.Elem
       }
       setHydrated(true);
     });
+  }, []);
+
+  const refreshServerUser = useCallback(async () => {
+    if (!profile?.backendUrl) return;
+    const token = await getStoredToken();
+    if (!token) {
+      setServerUser(null);
+      return;
+    }
+    try {
+      const user = await getCurrentUser(profile.backendUrl, token);
+      setServerUser(user);
+    } catch {
+      setServerUser(null);
+      await clearStoredToken();
+    }
+  }, [profile?.backendUrl]);
+
+  useEffect(() => {
+    if (hydrated && profile?.backendUrl) {
+      void refreshServerUser();
+    }
+  }, [hydrated, profile?.backendUrl, refreshServerUser]);
+
+  const logout = useCallback(async () => {
+    await clearStoredToken();
+    setServerUser(null);
   }, []);
   const saveProfile = useCallback(async (next: AccountProfile) => {
     const normalized: AccountProfile = {
@@ -124,15 +157,18 @@ export function AccountProvider({ children }: PropsWithChildren): React.JSX.Elem
   );
   // Stable context: only update when profile reference actually changes.
   const valueRef = useRef<AccountContextValue | null>(null);
-  if (!valueRef.current || valueRef.current.profile !== profile || valueRef.current.hydrated !== hydrated) {
+  if (!valueRef.current || valueRef.current.profile !== profile || valueRef.current.hydrated !== hydrated || valueRef.current.serverUser !== serverUser) {
     valueRef.current = {
       profile,
+      serverUser,
       hydrated,
       saveProfile,
       updateProfile,
       saveSourceCredential,
       getSourceCredential,
       hasSource,
+      refreshServerUser,
+      logout,
     };
   }
   return <AccountContext.Provider value={valueRef.current}>{children}</AccountContext.Provider>;

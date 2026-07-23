@@ -10,6 +10,7 @@ import { apiBase } from "@/utils/apiBase";
 import { getLogText } from "@/utils/logger";
 import { loadListeningHistory } from "@/services/listeningHistory";
 import { loadFavorites } from "@/services/favorites";
+
 interface HealthState {
   ok: boolean;
   status: string;
@@ -19,13 +20,44 @@ interface HealthState {
   capabilities?: Record<string, boolean>;
   error?: string;
 }
+
 function StatusDot({ ok }: { ok: boolean }): React.JSX.Element {
   return <View style={{ width: 9, height: 9, borderRadius: 9, backgroundColor: ok ? "#22c55e" : "#ef4444" }} />;
 }
+
 export default function AdminScreen(): React.JSX.Element {
-  const { profile, getSourceCredential } = useAccount();
+  const { profile, serverUser, getSourceCredential } = useAccount();
   const { t } = useI18n();
   const { tokens } = useTheme();
+
+  // Permission check: only admin can access
+  useEffect(() => {
+    if (serverUser && serverUser.role !== "admin") {
+      router.replace("/(tabs)");
+    }
+  }, [serverUser]);
+
+  if (!serverUser || serverUser.role !== "admin") {
+    return (
+      <ThemedScreen>
+        <View className="flex-1 items-center justify-center px-8">
+          <Text style={{ color: tokens.text, fontSize: 20, fontWeight: "800", textAlign: "center" }}>
+            {t("adminPermissionDenied")}
+          </Text>
+          <Text className="mt-3 text-center" style={{ color: tokens.mutedText }}>
+            {t("adminPermissionHint")}
+          </Text>
+          <Pressable
+            className="mt-6 rounded-full px-6 py-3"
+            style={{ backgroundColor: tokens.accent }}
+            onPress={() => router.replace("/(tabs)")}
+          >
+            <Text style={{ color: "#fff", fontWeight: "700" }}>{t("back")}</Text>
+          </Pressable>
+        </View>
+      </ThemedScreen>
+    );
+  }
   const [loading, setLoading] = useState(true);
   const [historyCount, setHistoryCount] = useState(0);
   const [favoriteCount, setFavoriteCount] = useState(0);

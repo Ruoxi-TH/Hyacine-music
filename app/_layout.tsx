@@ -27,31 +27,55 @@ const stackAnimation = {
 };
 
 function AppNavigator(): React.JSX.Element {
-  const { hydrated, profile } = useAccount();
+  const { hydrated, profile, serverUser } = useAccount();
   const pathname = usePathname();
   useRegisterTrackResolver();
-  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue";
+  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/register" && pathname !== "/login";
 
   useEffect(() => {
     if (!hydrated) return;
     appLog.info("boot", "account hydrated", {
       hasProfile: Boolean(profile),
+      hasServerUser: Boolean(serverUser),
       onboardingCompleted: profile?.onboardingCompleted === true,
       musicSource: profile?.musicSources ?? null,
       backendHost: profile?.backendUrl
         ? profile.backendUrl.replace(/^https?:\/\//i, "").split("/")[0]
         : null,
     });
-  }, [hydrated, profile]);
+  }, [hydrated, profile, serverUser]);
 
   if (!hydrated) return <AppLoadingScreen />;
-  if (!profile || !profile.onboardingCompleted) {
+  
+  // Step 1: No backend URL configured -> show welcome/onboarding to configure server
+  if (!profile?.backendUrl) {
+    return (
+      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
+        <Stack.Screen name="index" />
+      </Stack>
+    );
+  }
+  
+  // Step 2: Backend configured but not logged in -> show login/register
+  if (!serverUser) {
+    return (
+      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
+      </Stack>
+    );
+  }
+  
+  // Step 3: Logged in but onboarding not completed -> show onboarding
+  if (!profile?.onboardingCompleted) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
         <Stack.Screen name="onboarding" />
       </Stack>
     );
   }
+  
+  // Step 4: Onboarding done but no music source -> show sources page
   if (!profile?.musicSources?.length) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade_from_bottom" }}>
@@ -59,12 +83,16 @@ function AppNavigator(): React.JSX.Element {
       </Stack>
     );
   }
+  
+  // Step 5: All done -> show main app
   return (
     <>
       <Stack screenOptions={stackAnimation}>
         <Stack.Screen name="(tabs)" options={{ animation: "fade", gestureEnabled: false }} />
         <Stack.Screen name="onboarding" options={{ presentation: "card", animation: "slide_from_right" }} />
         <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
         <Stack.Screen
           name="settings"
           options={{
@@ -74,6 +102,17 @@ function AppNavigator(): React.JSX.Element {
             fullScreenGestureEnabled: true,
           }}
         />
+        {serverUser?.role === "admin" ? (
+          <Stack.Screen
+            name="admin"
+            options={{
+              presentation: "card",
+              animation: "slide_from_right",
+              gestureEnabled: true,
+              fullScreenGestureEnabled: true,
+            }}
+          />
+        ) : null}
         <Stack.Screen
           name="player/[id]"
           options={{
