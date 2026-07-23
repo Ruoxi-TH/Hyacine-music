@@ -44,7 +44,7 @@ export function LiquidControlSurface({
       className={`overflow-hidden border ${className}`}
       style={[
         {
-          backgroundColor: "transparent",
+          backgroundColor: tokens.isLight ? "rgba(226,234,248,0.20)" : "rgba(18,26,42,0.44)",
           borderColor: "#ffffff8c",
           shadowColor: "#24364f",
           shadowOpacity: 0.08,
@@ -66,6 +66,7 @@ export function LiquidControlSurface({
           style={{ backgroundColor: "transparent" }}
         />
       ) : null}
+      <View pointerEvents="none" className="absolute inset-0" style={{ backgroundColor: tokens.isLight ? "rgba(220,230,247,0.22)" : "rgba(25,34,54,0.20)" }} />
       <View pointerEvents="none" className="absolute left-0 right-0 top-0 h-px" style={{ backgroundColor: "#ffffffaa" }} />
       {children}
     </View>
