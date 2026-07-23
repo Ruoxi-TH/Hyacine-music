@@ -144,7 +144,7 @@ export default function RegisterScreen(): React.JSX.Element {
         avatarUrl: "",
       });
       Alert.alert(t("registerSuccess"), t("registerWelcome"), [
-        { text: t("continue"), onPress: () => router.replace("/onboarding") },
+        { text: t("continue"), onPress: () => router.replace("/sources") },
       ]);
     } catch (error) {
       Alert.alert(
