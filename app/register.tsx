@@ -391,7 +391,7 @@ export default function RegisterScreen(): React.JSX.Element {
             </Text>
             {captchaImage && (
               <Image
-                className="h-10 w-full"
+                className="h-20 w-full"
                 source={{ uri: captchaImage }}
                 resizeMode="contain"
               />
