@@ -3,11 +3,6 @@ import { apiBase } from "@/utils/apiBase";
 
 const TOKEN_KEY = "hyacine.auth.token";
 
-export interface CaptchaResponse {
-  id: string;
-  image: string;
-}
-
 export interface User {
   id: number;
   username: string;
@@ -36,30 +31,15 @@ export async function clearStoredToken(): Promise<void> {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
 
-export async function getCaptcha(backendUrl: string): Promise<CaptchaResponse> {
-  const base = apiBase(backendUrl);
-  const response = await fetch(`${base}/auth/captcha`);
-  if (!response.ok) {
-    throw new Error("Failed to get captcha");
-  }
-  return response.json();
-}
-
 export async function sendVerificationCode(
   backendUrl: string,
-  email: string,
-  captchaId: string,
-  captchaCode: string
+  email: string
 ): Promise<{ message: string }> {
   const base = apiBase(backendUrl);
   const response = await fetch(`${base}/auth/send-code`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email,
-      captcha_id: captchaId,
-      captcha_code: captchaCode,
-    }),
+    body: JSON.stringify({ email }),
   });
   const data = await response.json();
   if (!response.ok) {
