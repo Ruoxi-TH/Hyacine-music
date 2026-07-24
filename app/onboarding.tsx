@@ -66,7 +66,7 @@ export default function OnboardingScreen(): React.JSX.Element {
     try {
       const response = await fetch(healthUrl);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      await saveProfile({ displayName: name, avatarUrl: avatar, backendUrl: normalizedBackend, musicSources: profile?.musicSources ?? [], onboardingCompleted: true });
+      await saveProfile({ displayName: name, avatarUrl: avatar, backendUrl: normalizedBackend, musicSources: profile?.musicSources ?? [], onboardingCompleted: false });
       router.replace("/login");
     } catch (error) {
       const detail = error instanceof Error && error.message ? `（${error.message}）` : "";

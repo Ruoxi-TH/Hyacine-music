@@ -47,10 +47,21 @@ function AppNavigator(): React.JSX.Element {
 
   if (!hydrated) return <AppLoadingScreen />;
 
-  if (!profile || !profile.onboardingCompleted) {
+  if (!profile?.backendUrl) {
+    return (
+      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
+        <Stack.Screen name="index" />
+      </Stack>
+    );
+  }
+
+  if (!profile.onboardingCompleted) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
         <Stack.Screen name="onboarding" />
+        <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
       </Stack>
     );
   }
