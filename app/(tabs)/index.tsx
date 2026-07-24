@@ -47,6 +47,7 @@ function greetingKeyForHour(hour: number): TranslationKey {
 export default function HomeScreen(): React.JSX.Element {
   const { playTrack, skipTrack } = useAudio();
   const setQueue = usePlayerStore((state) => state.setQueue);
+  const currentTrack = usePlayerStore((state) => state.currentTrack);
   const { t } = useI18n();
   const { tokens } = useTheme();
   const { profile, getSourceCredential } = useAccount();
@@ -217,7 +218,7 @@ export default function HomeScreen(): React.JSX.Element {
                 {featured.artwork ? <><Image source={{ uri: songs[(featuredIndex + 2) % songs.length]?.artwork ?? featured.artwork }} contentFit="cover" style={{ position: "absolute", width: 112, height: 144, borderRadius: 24, right: 1, top: 9, opacity: 0.35, transform: [{ rotate: "12deg" }] }} /><Image source={{ uri: songs[(featuredIndex + 1) % songs.length]?.artwork ?? featured.artwork }} contentFit="cover" style={{ position: "absolute", width: 120, height: 160, borderRadius: 24, right: 18, top: 4, opacity: 0.65, transform: [{ rotate: "5deg" }] }} /><View className="absolute h-44 w-32 overflow-hidden rounded-3xl" style={{ right: 36, top: 0, shadowColor: "#17212d", shadowOpacity: 0.22, shadowRadius: 14, shadowOffset: { width: 0, height: 8 }, elevation: 0, transform: [{ rotate: "-4deg" }] }}><Image source={{ uri: featured.artwork }} contentFit="cover" style={{ width: "100%", height: "100%" }} onLoad={() => logCoverResult("load", featured.id, featured.artwork)} onError={() => logCoverResult("error", featured.id, featured.artwork)} /></View></> : <View className="h-44 w-32 items-center justify-center rounded-3xl" style={{ backgroundColor: `${tokens.accent}22`, borderWidth: 1, borderColor: `${tokens.accent}55` }}><Text style={{ color: tokens.accent, fontSize: 28, fontWeight: "900" }}>♪</Text></View>}
               </View>
             </View>
-            </GestureDetector><Pressable onPress={() => void onPlay(featured)}><LiquidControlSurface className="mt-5 h-12 self-start rounded-full px-5" style={{ borderRadius: 24 }}><View className="h-full flex-row items-center justify-center"><Text style={{ color: tokens.text, fontWeight: "800" }}>{usePlayerStore.getState().currentTrack ? t("nowPlayingEllipsis") : `▶ ${t("playRecommendation")}`}</Text></View></LiquidControlSurface></Pressable>
+            </GestureDetector><Pressable onPress={() => void onPlay(featured)}><LiquidControlSurface className="mt-5 h-12 self-start rounded-full px-5" style={{ borderRadius: 24 }}><View className="h-full flex-row items-center justify-center"><Text style={{ color: tokens.text, fontWeight: "800" }}>{currentTrack ? t("nowPlayingEllipsis") : `▶ ${t("playRecommendation")}`}</Text></View></LiquidControlSurface></Pressable>
           </Animated.View>
 
        </ThemedCard> : null}

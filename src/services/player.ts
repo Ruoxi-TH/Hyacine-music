@@ -88,7 +88,11 @@ function bindStatus(active: AudioPlayer): void {
         setQueue(refreshed, id);
         void (trackResolver ? trackResolver(track) : Promise.resolve(track))
           .then((resolved) => playTrack(resolved))
-          .catch((error) => appLog.error("player", "auto next failed", { error, id }));
+          .catch((error) => {
+            appLog.error("player", "auto next failed", { error, id });
+            completed = false;
+            usePlayerStore.getState().setPlaying(false);
+          });
       };
       if (repeatMode === "one" && currentTrack) {
         playResolved(currentTrack, currentTrack.id);
