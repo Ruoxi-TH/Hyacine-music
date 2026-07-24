@@ -30,7 +30,7 @@ function AppNavigator(): React.JSX.Element {
   const { hydrated, profile, serverUser } = useAccount();
   const pathname = usePathname();
   useRegisterTrackResolver();
-  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/login" && pathname !== "/register" && pathname !== "/onboarding" && pathname !== "/";
+  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/login" && pathname !== "/register" && pathname !== "/";
 
   useEffect(() => {
     if (!hydrated) return;
@@ -55,22 +55,12 @@ function AppNavigator(): React.JSX.Element {
     );
   }
 
-  if (!profile.onboardingCompleted) {
-    return (
-      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
-      </Stack>
-    );
-  }
-
   if (!serverUser) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
         <Stack.Screen name="login" />
         <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
       </Stack>
     );
   }
@@ -87,7 +77,6 @@ function AppNavigator(): React.JSX.Element {
     <>
       <Stack screenOptions={stackAnimation}>
         <Stack.Screen name="(tabs)" options={{ animation: "fade", gestureEnabled: false }} />
-        <Stack.Screen name="onboarding" options={{ presentation: "card", animation: "slide_from_right" }} />
         <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
         <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
         <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />

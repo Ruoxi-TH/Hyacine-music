@@ -62,7 +62,7 @@ export default function WelcomeScreen(): React.JSX.Element {
         onboardingCompleted: false,
       });
       
-      router.replace("/onboarding");
+      router.replace("/login");
     } catch (err) {
       const detail = err instanceof Error ? `（${err.message}）` : "";
       setError(`${t("backendConnectError")} ${healthUrl}${detail}`);
