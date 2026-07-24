@@ -45,6 +45,10 @@ function AppNavigator(): React.JSX.Element {
     });
   }, [hydrated, profile, serverUser]);
 
+  useEffect(() => {
+    appLog.info("layout", "render state", { pathname, showMiniPlayer, onboardingCompleted: profile?.onboardingCompleted });
+  }, [pathname, showMiniPlayer, profile?.onboardingCompleted]);
+
   if (!hydrated) return <AppLoadingScreen />;
 
   if (profile?.onboardingCompleted) {
