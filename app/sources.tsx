@@ -19,7 +19,7 @@ interface QrPayload { key?: string; qrUrl?: string; message?: string; }
 interface PollPayload { status?: "pending" | "confirmed" | "expired"; cookie?: string; }
 
 export default function SourcesScreen(): React.JSX.Element {
-  const { profile, saveSourceCredential, updateProfile, saveProfile } = useAccount();
+  const { profile, saveSourceCredential, updateProfile, saveProfile, hasSource } = useAccount();
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const isLiquid = preferences.uiStyle === "liquid";
@@ -99,7 +99,17 @@ export default function SourcesScreen(): React.JSX.Element {
           if (!response.ok) return;
           if (data.status === "confirmed" && data.cookie) {
             clearInterval(timer);
-            void saveSourceCredential("netease", data.cookie).then(async () => { await syncNeteaseProfile(data.cookie!); await saveProfile({ ...profile!, onboardingCompleted: true }); router.replace("/(tabs)"); });
+            void saveSourceCredential("netease", data.cookie).then(async () => {
+              await syncNeteaseProfile(data.cookie!);
+              await saveProfile({
+                displayName: profile?.displayName ?? "",
+                avatarUrl: profile?.avatarUrl ?? "",
+                backendUrl: profile?.backendUrl ?? "",
+                musicSources: ["netease", ...profile?.musicSources.filter(s => s !== "netease") ?? []],
+                onboardingCompleted: true,
+              });
+              router.replace("/(tabs)");
+            });
           }
           if (data.status === "expired") {
             clearInterval(timer);
@@ -119,7 +129,13 @@ export default function SourcesScreen(): React.JSX.Element {
     try {
       await saveSourceCredential("netease", credential);
       await syncNeteaseProfile(credential);
-      await saveProfile({ ...profile!, onboardingCompleted: true });
+      await saveProfile({
+        displayName: profile?.displayName ?? "",
+        avatarUrl: profile?.avatarUrl ?? "",
+        backendUrl: profile?.backendUrl ?? "",
+        musicSources: ["netease", ...profile?.musicSources.filter(s => s !== "netease") ?? []],
+        onboardingCompleted: true,
+      });
       router.replace("/(tabs)");
     } catch {
       setNote(t("cookieSaveFailed"));
@@ -139,7 +155,13 @@ export default function SourcesScreen(): React.JSX.Element {
       const data = await response.json() as { valid?: boolean };
       if (!response.ok || !data.valid) throw new Error();
       await saveSourceCredential("bilibili", cookie);
-      await saveProfile({ ...profile!, onboardingCompleted: true });
+      await saveProfile({
+        displayName: profile?.displayName ?? "",
+        avatarUrl: profile?.avatarUrl ?? "",
+        backendUrl: profile?.backendUrl ?? "",
+        musicSources: ["bilibili", ...profile?.musicSources.filter(s => s !== "bilibili") ?? []],
+        onboardingCompleted: true,
+      });
       router.replace("/(tabs)");
     } catch {
       setNote(t("cookieValidationFailed"));
