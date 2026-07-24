@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
@@ -10,10 +11,17 @@ import { useTheme } from "@/theme";
 const brandIcon = require("../assets/brand-icon.png");
 
 export default function WelcomeScreen(): React.JSX.Element {
-  const { profile } = useAccount();
+  const { profile, serverUser, hydrated } = useAccount();
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const isLiquid = preferences.uiStyle === "liquid";
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (profile?.onboardingCompleted && serverUser && profile.musicSources?.length) {
+      router.replace("/(tabs)");
+    }
+  }, [hydrated, profile, serverUser]);
 
   const handleContinue = () => {
     if (profile?.backendUrl) {
@@ -26,13 +34,7 @@ export default function WelcomeScreen(): React.JSX.Element {
   return (
     <ThemedScreen>
       <View className="flex-1 items-center justify-center px-8">
-        <Text
-          style={{ color: tokens.mutedText, fontSize: 12, fontWeight: "800", letterSpacing: 1.4 }}
-        >
-          {t("onboardingStep")} 01/04
-        </Text>
-        
-        <View className="mt-8 h-24 w-24 overflow-hidden rounded-[28px]" style={{ backgroundColor: "transparent" }}>
+        <View className="h-24 w-24 overflow-hidden rounded-[28px]" style={{ backgroundColor: "transparent" }}>
           <Image
             source={brandIcon}
             className="h-full w-full"
