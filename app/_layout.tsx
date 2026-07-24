@@ -30,7 +30,7 @@ function AppNavigator(): React.JSX.Element {
   const { hydrated, profile, serverUser } = useAccount();
   const pathname = usePathname();
   useRegisterTrackResolver();
-  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && !pathname.startsWith("/playlist/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/login" && pathname !== "/register";
+  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && !pathname.startsWith("/playlist/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/login" && pathname !== "/register" && pathname.startsWith("/(tabs)");
 
   useEffect(() => {
     if (!hydrated) return;
@@ -47,10 +47,14 @@ function AppNavigator(): React.JSX.Element {
 
   if (!hydrated) return <AppLoadingScreen />;
 
-  if (!profile?.backendUrl) {
+  if (!profile?.onboardingCompleted) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
+        <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
       </Stack>
     );
   }
@@ -60,7 +64,6 @@ function AppNavigator(): React.JSX.Element {
       <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
         <Stack.Screen name="login" />
         <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
       </Stack>
     );
   }

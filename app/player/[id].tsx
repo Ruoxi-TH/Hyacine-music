@@ -358,8 +358,8 @@ export default function FullPlayerScreen(): React.JSX.Element {
           <Pressable onPress={() => router.back()}>
             <Text style={{ color: tokens.accent, fontWeight: "900" }}>⌄ {t("closePlayer")}</Text>
           </Pressable>
-          <Pressable accessibilityLabel={t("nowPlaying")} onPress={() => router.push("/queue")}>
-            <Text style={{ color: tokens.accent, fontSize: 22, fontWeight: "900" }}>≡</Text>
+          <Pressable accessibilityLabel={t("audioQualityAndEffects")} onPress={() => router.push("/audio-settings")}>
+            <Text style={{ color: tokens.accent, fontSize: 16, fontWeight: "800" }}>♪</Text>
           </Pressable>
         </View>
 
