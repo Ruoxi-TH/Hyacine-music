@@ -8,8 +8,6 @@ import { TrackCover } from "@/components/TrackCover";
 import { LiquidControlSurface } from "@/components/ui/LiquidControlSurface";
 import { useTheme } from "@/theme";
 import { fadeAnim } from "@/utils/scrollY";
-import { appLog } from "@/utils/logger";
-import { useEffect } from "react";
 
 export function MiniPlayer(): React.JSX.Element | null {
   const track = usePlayerStore((state) => state.currentTrack);
@@ -19,11 +17,6 @@ export function MiniPlayer(): React.JSX.Element | null {
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const { bottom: safeBottom } = useSafeAreaInsets();
-
-  useEffect(() => {
-    appLog.info("miniplayer", "render", { hasTrack: Boolean(track), trackId: track?.id ?? null, title: track?.title ?? null });
-  }, [track]);
-
   if (!track) return null;
   const canSkip = queue.length > 1;
 
