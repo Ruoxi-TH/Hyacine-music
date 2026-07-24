@@ -57,14 +57,7 @@ export default function WelcomeScreen(): React.JSX.Element {
         </Text>
 
         <Pressable
-          className="mt-14 h-16 w-full items-center justify-center overflow-hidden rounded-3xl"
-          style={{
-            shadowColor: tokens.accent,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.35,
-            shadowRadius: 16,
-            elevation: 8,
-          }}
+          className="mt-12 h-14 w-full items-center justify-center overflow-hidden rounded-2xl"
           onPress={handleContinue}
         >
           <LinearGradient
@@ -77,7 +70,7 @@ export default function WelcomeScreen(): React.JSX.Element {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           />
-          <Text className="text-lg font-bold" style={{ color: "#fff" }}>
+          <Text className="text-base font-bold" style={{ color: "#fff" }}>
             {t("continue")}
           </Text>
         </Pressable>
