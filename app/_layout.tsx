@@ -47,55 +47,17 @@ function AppNavigator(): React.JSX.Element {
 
   if (!hydrated) return <AppLoadingScreen />;
 
-  if (!profile?.onboardingCompleted) {
+  if (profile?.onboardingCompleted) {
     return (
-      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
-      </Stack>
-    );
-  }
-
-  if (!serverUser) {
-    return (
-      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
-        <Stack.Screen name="login" />
-        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
-      </Stack>
-    );
-  }
-
-  if (!profile?.musicSources?.length) {
-    return (
-      <Stack screenOptions={{ ...stackAnimation, animation: "fade_from_bottom" }}>
-        <Stack.Screen name="sources" />
-      </Stack>
-    );
-  }
-
-  return (
-    <>
-      <Stack screenOptions={stackAnimation}>
-        <Stack.Screen name="(tabs)" options={{ animation: "fade", gestureEnabled: false }} />
-        <Stack.Screen name="onboarding" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
-        <Stack.Screen
-          name="settings"
-          options={{
-            presentation: "card",
-            animation: "slide_from_right",
-            gestureEnabled: true,
-            fullScreenGestureEnabled: true,
-          }}
-        />
-        {serverUser?.role === "admin" ? (
+      <>
+        <Stack screenOptions={stackAnimation}>
+          <Stack.Screen name="(tabs)" options={{ animation: "fade", gestureEnabled: false }} />
+          <Stack.Screen name="onboarding" options={{ presentation: "card", animation: "slide_from_right" }} />
+          <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
+          <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
+          <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
           <Stack.Screen
-            name="admin"
+            name="settings"
             options={{
               presentation: "card",
               animation: "slide_from_right",
@@ -103,21 +65,42 @@ function AppNavigator(): React.JSX.Element {
               fullScreenGestureEnabled: true,
             }}
           />
-        ) : null}
-        <Stack.Screen
-          name="player/[id]"
-          options={{
-            presentation: "fullScreenModal",
-            animation: "slide_from_bottom",
-            animationDuration: 320,
-            gestureEnabled: true,
-            fullScreenGestureEnabled: true,
-            gestureDirection: "vertical",
-          }}
-        />
-      </Stack>
-      {showMiniPlayer ? <MiniPlayer /> : null}
-    </>
+          {serverUser?.role === "admin" ? (
+            <Stack.Screen
+              name="admin"
+              options={{
+                presentation: "card",
+                animation: "slide_from_right",
+                gestureEnabled: true,
+                fullScreenGestureEnabled: true,
+              }}
+            />
+          ) : null}
+          <Stack.Screen
+            name="player/[id]"
+            options={{
+              presentation: "fullScreenModal",
+              animation: "slide_from_bottom",
+              animationDuration: 320,
+              gestureEnabled: true,
+              fullScreenGestureEnabled: true,
+              gestureDirection: "vertical",
+            }}
+          />
+        </Stack>
+        {showMiniPlayer ? <MiniPlayer /> : null}
+      </>
+    );
+  }
+
+  return (
+    <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="onboarding" />
+      <Stack.Screen name="login" options={{ presentation: "card", animation: "slide_from_right" }} />
+      <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
+      <Stack.Screen name="sources" options={{ presentation: "card", animation: "slide_from_right" }} />
+    </Stack>
   );
 }
 

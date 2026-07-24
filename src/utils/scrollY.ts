@@ -20,6 +20,8 @@ export const globalScrollY = new Animated.Value(0);
 export const fadeAnim = new Animated.Value(1);
 
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
+let safetyTimer: ReturnType<typeof setInterval> | null = null;
+let lastFadeTime = 0;
 
 // --- Y 轴增量判断状态 ---
 let lastScrollY = 0;
@@ -45,12 +47,19 @@ const X_INHIBIT_THRESHOLD = 4;
  */
 const CONFIRM_FRAMES = 3;
 
+/**
+ * 安全恢复超时（ms）：fadeAnim 为 0 超过此时间后自动恢复为 1。
+ * 防止因事件丢失（如 scrollEnd 未触发）导致 MiniPlayer/TabBar 永久消失。
+ */
+const SAFETY_RESTORE_MS = 3000;
+
 /** 立即渐隐 TabBar 和 MiniPlayer。 */
 function notifyScrollBegin(): void {
   if (hideTimer) {
     clearTimeout(hideTimer);
     hideTimer = null;
   }
+  lastFadeTime = Date.now();
   Animated.timing(fadeAnim, {
     toValue: 0,
     duration: 200,
@@ -68,8 +77,34 @@ function notifyScrollEnd(): void {
       useNativeDriver: true,
     }).start();
     hideTimer = null;
-  }, 150);
+    isFaded = false;
+  }, 100);
 }
+
+/**
+ * 安全恢复：定期检查 fadeAnim 是否卡在 0 状态过久。
+ * 如果 fadeAnim 为 0 超过 SAFETY_RESTORE_MS，强制恢复为 1。
+ */
+function ensureSafetyRestore(): void {
+  if (safetyTimer) return;
+  safetyTimer = setInterval(() => {
+    if (isFaded && lastFadeTime > 0 && Date.now() - lastFadeTime > SAFETY_RESTORE_MS) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true,
+      }).start();
+      isFaded = false;
+      lastFadeTime = 0;
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+    }
+  }, 1000);
+}
+
+ensureSafetyRestore();
 
 /**
  * 在 onScroll listener 中调用：根据 Y 轴增量判断是否应渐隐。
@@ -128,6 +163,7 @@ export function resetScrollY(): void {
   confirmCount = 0;
   lastScrollY = 0;
   lastScrollX = 0;
+  lastFadeTime = 0;
   if (hideTimer) {
     clearTimeout(hideTimer);
     hideTimer = null;

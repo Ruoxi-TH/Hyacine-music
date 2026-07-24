@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Pressable, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "expo-image";
@@ -11,17 +10,10 @@ import { useTheme } from "@/theme";
 const brandIcon = require("../assets/brand-icon.png");
 
 export default function WelcomeScreen(): React.JSX.Element {
-  const { profile, serverUser, hydrated } = useAccount();
+  const { profile } = useAccount();
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const isLiquid = preferences.uiStyle === "liquid";
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (profile?.onboardingCompleted && serverUser && profile.musicSources?.length) {
-      router.replace("/(tabs)");
-    }
-  }, [hydrated, profile, serverUser]);
 
   const handleContinue = () => {
     if (profile?.backendUrl) {

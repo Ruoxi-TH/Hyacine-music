@@ -35,13 +35,22 @@ const STORAGE_KEY = "hyacine.account-profile";
 const credentialKey = (source: MusicSource): string => `hyacine.music-source.${source}`;
 const AccountContext = createContext<AccountContextValue | null>(null);
 function readProfile(value: Partial<AccountProfile>): AccountProfile | null {
+  if (value.onboardingCompleted === true) {
+    return {
+      displayName: value.displayName?.trim() ?? "",
+      avatarUrl: value.avatarUrl?.trim() ?? "",
+      backendUrl: value.backendUrl ?? "",
+      musicSources: value.musicSources ?? [],
+      onboardingCompleted: true,
+    };
+  }
   if (!value.backendUrl?.trim()) return null;
   return {
     displayName: value.displayName?.trim() ?? "",
     avatarUrl: value.avatarUrl?.trim() ?? "",
     backendUrl: value.backendUrl,
     musicSources: value.musicSources ?? [],
-    onboardingCompleted: value.onboardingCompleted === true,
+    onboardingCompleted: false,
   };
 }
 function profilesEqual(a: AccountProfile | null, b: AccountProfile | null): boolean {
