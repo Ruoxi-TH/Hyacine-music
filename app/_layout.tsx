@@ -30,7 +30,7 @@ function AppNavigator(): React.JSX.Element {
   const { hydrated, profile, serverUser } = useAccount();
   const pathname = usePathname();
   useRegisterTrackResolver();
-  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/login" && pathname !== "/register" && pathname !== "/onboarding";
+  const showMiniPlayer = !pathname.startsWith("/settings") && !pathname.startsWith("/player/") && pathname !== "/admin" && pathname !== "/queue" && pathname !== "/login" && pathname !== "/register" && pathname !== "/onboarding" && pathname !== "/";
 
   useEffect(() => {
     if (!hydrated) return;

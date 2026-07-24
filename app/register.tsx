@@ -24,7 +24,7 @@ import {
 import { LIQUID_GLASS_COLORS } from "@/constants/liquidGlass";
 
 export default function RegisterScreen(): React.JSX.Element {
-  const { profile, updateProfile } = useAccount();
+  const { profile, updateProfile, refreshServerUser } = useAccount();
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const isLiquid = preferences.uiStyle === "liquid";
@@ -107,6 +107,7 @@ export default function RegisterScreen(): React.JSX.Element {
         displayName: result.user.username,
         avatarUrl: "",
       });
+      await refreshServerUser();
       Alert.alert(t("registerSuccess"), t("registerWelcome"), [
         { text: t("continue"), onPress: () => router.replace("/sources") },
       ]);

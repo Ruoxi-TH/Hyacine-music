@@ -20,7 +20,7 @@ import { login, setStoredToken } from "@/services/auth";
 import { LIQUID_GLASS_COLORS } from "@/constants/liquidGlass";
 
 export default function LoginScreen(): React.JSX.Element {
-  const { profile } = useAccount();
+  const { profile, refreshServerUser } = useAccount();
   const { t } = useI18n();
   const { preferences, tokens } = useTheme();
   const isLiquid = preferences.uiStyle === "liquid";
@@ -48,6 +48,7 @@ export default function LoginScreen(): React.JSX.Element {
     try {
       const result = await login(profile.backendUrl, email.trim(), password);
       await setStoredToken(result.token);
+      await refreshServerUser();
       Alert.alert(t("loginSuccess"), t("loginWelcome"), [
         {
           text: t("continue"),
