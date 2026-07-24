@@ -27,7 +27,7 @@ export function MiniPlayer(): React.JSX.Element | null {
   const fadeOpacity = fadeAnim;
   const fadeTranslate = fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [40, 0], extrapolate: "clamp" });
 
-  const overlayStyle = { position: "absolute" as const, top: 0, left: 0, right: 0, bottom: 0, opacity: fadeOpacity, transform: [{ translateY: fadeTranslate }], pointerEvents: "box-none" as const };
+  const overlayStyle = { position: "absolute" as const, top: 0, left: 0, right: 0, bottom: 0, opacity: fadeOpacity, transform: [{ translateY: fadeTranslate }], pointerEvents: "box-none" as const, zIndex: 999 };
 
   if (preferences.miniPlayerStyle === "capsule") return (
     <Animated.View pointerEvents="box-none" style={overlayStyle}>
