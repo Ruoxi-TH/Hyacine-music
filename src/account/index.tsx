@@ -32,6 +32,7 @@ interface AccountContextValue {
   logout: () => Promise<void>;
 }
 const STORAGE_KEY = "hyacine.account-profile";
+const CACHED_USER_KEY = "hyacine.cached-server-user";
 const credentialKey = (source: MusicSource): string => `hyacine.music-source.${source}`;
 const AccountContext = createContext<AccountContextValue | null>(null);
 function readProfile(value: Partial<AccountProfile>): AccountProfile | null {
@@ -74,7 +75,11 @@ export function AccountProvider({ children }: PropsWithChildren): React.JSX.Elem
   const [hydrated, setHydrated] = useState(false);
   const profileRef = useRef<AccountProfile | null>(null);
   useEffect(() => {
-    void SecureStore.getItemAsync(STORAGE_KEY).then((raw) => {
+    void (async () => {
+      const [raw, cachedUser] = await Promise.all([
+        SecureStore.getItemAsync(STORAGE_KEY),
+        SecureStore.getItemAsync(CACHED_USER_KEY),
+      ]);
       if (raw) {
         try {
           const parsed = readProfile(JSON.parse(raw) as Partial<AccountProfile>);
@@ -84,8 +89,15 @@ export function AccountProvider({ children }: PropsWithChildren): React.JSX.Elem
           // ignore corrupt profile payload
         }
       }
+      if (cachedUser) {
+        try {
+          setServerUser(JSON.parse(cachedUser) as User);
+        } catch {
+          // ignore corrupt cached user
+        }
+      }
       setHydrated(true);
-    });
+    })();
   }, []);
 
   const refreshServerUser = useCallback(async () => {
@@ -98,9 +110,18 @@ export function AccountProvider({ children }: PropsWithChildren): React.JSX.Elem
     try {
       const user = await getCurrentUser(profile.backendUrl, token);
       setServerUser(user);
+      await SecureStore.setItemAsync(CACHED_USER_KEY, JSON.stringify(user));
     } catch {
-      setServerUser(null);
-      await clearStoredToken();
+      const cached = await SecureStore.getItemAsync(CACHED_USER_KEY);
+      if (cached) {
+        try {
+          setServerUser(JSON.parse(cached) as User);
+        } catch {
+          setServerUser(null);
+        }
+      } else {
+        setServerUser(null);
+      }
     }
   }, [profile?.backendUrl]);
 
@@ -112,6 +133,7 @@ export function AccountProvider({ children }: PropsWithChildren): React.JSX.Elem
 
   const logout = useCallback(async () => {
     await clearStoredToken();
+    await SecureStore.deleteItemAsync(CACHED_USER_KEY);
     setServerUser(null);
   }, []);
   const saveProfile = useCallback(async (next: AccountProfile) => {

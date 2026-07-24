@@ -17,7 +17,7 @@ import { LIQUID_GLASS_COLORS } from "@/constants/liquidGlass";
 
 export default function ProfileScreen(): React.JSX.Element {
   const { t } = useI18n();
-  const { profile, getSourceCredential, updateProfile } = useAccount();
+  const { profile, serverUser, getSourceCredential, updateProfile, logout } = useAccount();
   const { tokens } = useTheme();
   const glass = tokens.isLight ? LIQUID_GLASS_COLORS.light : LIQUID_GLASS_COLORS.dark;
   const { playTrack } = useAudio();
@@ -77,6 +77,11 @@ export default function ProfileScreen(): React.JSX.Element {
             <View className="ml-4 min-w-0 flex-1">
               <Text numberOfLines={1} style={{ color: tokens.text, fontSize: 22, fontWeight: "800" }}>{profile?.displayName || t("notSignedIn")}</Text>
               <Text className="mt-2 text-sm" numberOfLines={1} style={{ color: tokens.mutedText }}>{sourceName}</Text>
+              {!serverUser ? (
+                <Pressable className="mt-2 self-start rounded-full px-4 py-1.5" style={{ backgroundColor: `${tokens.accent}22` }} onPress={() => router.push("/login")}>
+                  <Text style={{ color: tokens.accent, fontSize: 12, fontWeight: "800" }}>{t("loginButton")}</Text>
+                </Pressable>
+              ) : null}
             </View>
             <Text style={{ color: tokens.mutedText, fontSize: 26 }}>›</Text>
           </Pressable>

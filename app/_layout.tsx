@@ -59,15 +59,6 @@ function AppNavigator(): React.JSX.Element {
     );
   }
 
-  if (!serverUser) {
-    return (
-      <Stack screenOptions={{ ...stackAnimation, animation: "fade" }}>
-        <Stack.Screen name="login" />
-        <Stack.Screen name="register" options={{ presentation: "card", animation: "slide_from_right" }} />
-      </Stack>
-    );
-  }
-
   if (!profile?.musicSources?.length) {
     return (
       <Stack screenOptions={{ ...stackAnimation, animation: "fade_from_bottom" }}>
