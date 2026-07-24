@@ -35,9 +35,9 @@ const STORAGE_KEY = "hyacine.account-profile";
 const credentialKey = (source: MusicSource): string => `hyacine.music-source.${source}`;
 const AccountContext = createContext<AccountContextValue | null>(null);
 function readProfile(value: Partial<AccountProfile>): AccountProfile | null {
-  if (!value.displayName?.trim() || !value.backendUrl?.trim()) return null;
+  if (!value.backendUrl?.trim()) return null;
   return {
-    displayName: value.displayName,
+    displayName: value.displayName?.trim() ?? "",
     avatarUrl: value.avatarUrl?.trim() ?? "",
     backendUrl: value.backendUrl,
     musicSources: value.musicSources ?? [],
